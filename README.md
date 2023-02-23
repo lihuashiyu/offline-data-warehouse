@@ -175,11 +175,21 @@
 ```bash
     # 使用 DataX 将 Hive ADS 层的表数据同步到 mysql，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
     warehouse/
+     ├── component.sh                                      # 各个大数据组件的启停脚本
+     ├── init.sh                                           # 部署完成后，一键初始化
+     ├── install.sh                                        # 一键部署脚本
+     └── warehouse.sh                                      # 整个数据流向数仓的启停脚本
+```
+
+### 3.11 warehouse 模块
+
+```bash
+    # 使用 DataX 将 Hive ADS 层的表数据同步到 mysql，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
+    warehouse
      ├── check_dim.sh
      ├── check_dwd.sh
      ├── check_ods.sh
      ├── command
-     ├── component.sh                                      # 各个大数据组件的启停脚本
      ├── day_on_day.sh
      ├── duplicate.sh
      ├── dwd_dws_1d.sh
@@ -204,10 +214,7 @@
      ├── ods_to_dwd_db_add.sh
      ├── ods_to_dwd_db_init.sh
      ├── ods_to_dwd_log.sh
-     ├── one_key_init.sh                                   # 部署完成后，一键初始化
-     ├── one_key_install.sh                                # 一键部署脚本
      ├── range.sh
-     ├── warehouse.sh                                      # 整个数据流向数仓的启停脚本
      └── week_on_week.sh
     
 ```
@@ -270,22 +277,27 @@
 ## 5. 数据生成合同步的构、部署和执行 
 
 ```bash
-    # 拉取项目，并进行构建
+    # 1. 拉取项目，并进行构建
     git clone https://github.com/lihuashiyu/offline-data-warehouse.git         # 使用 git 将仓库中的代码和文件克隆到本地 
     cd offline-data-warehouse/ || exit                                         # 进入项目
     ./build.sh                                                                 # 在项目的根目录下，进行构建项目，并将项目上传到服务器
     
-    # 登录 master 服务器，然后将部署包上传到 master 服务器用户的 家目录
+    # 2. 登录 master 服务器，然后将部署包上传到 master 服务器用户的 家目录
     cd ~ || exit                                                               # 进入用户家目录
-    tar -zxvf ~/offline-data-warehouse.tar.gz                                  # 解压部署包
+    tar -zxvf ~/offline-data-warehouse-1.0.tar.gz                                  # 解压部署包
     
-    # 进行集群部署
+    # 3. 进行集群部署
     cd ~/offline-data-warehouse  || exit                                       # 进入部署路径
-    ~/offline-data-warehouse/shell/install.sh                                  # 执行部署脚本，进行多台服务器部署
+    ~/offline-data-warehouse/shell/install.sh                                  # 执行安装脚本，进行多台服务器部署安装
     
-    # 一键启动，将生成的数据库数据、日志数据，同步到 HDFS 的 /hive/tmp/warehouse （注意：此脚本只适用于增量同步）
+    # 4. 部署后初始化
+    ~/offline-data-warehouse/shell/init.sh                                     # 执行初始化脚本，进行多台服务器部署完后初始化
+    
+    # 5. 一键启动，将生成的数据库数据、日志数据，同步到 HDFS 的 /hive/tmp/warehouse （注意：此脚本只适用于增量同步）
     ~/offline-data-warehouse/shell/warer-house.sh start                        # 执行部署脚本，进行多台服务器部署
     
-    # 查看数据是否同步成功
-    ${HADOOP_HOME}/bin/hadoop fs -ls -l /hive/tmp/warehouse/ 
+    # 6. 查看数据是否同步成功
+    ${HADOOP_HOME}/bin/hadoop fs -ls -l /hive/tmp/warehouse/
+    
+    # 7. 
 ```
