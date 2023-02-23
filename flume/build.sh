@@ -3,8 +3,8 @@
 # =========================================================================================
 #    FileName      ：  build.sh
 #    CreateTime    ：  2023-02-23 23:09
-#    Author        ：  Issac_Al
-#    Email         ：  IssacAl@qq.com
+#    Author        ：  lihua shiyu 
+#    Email         ：  lihuashiyu@github.com
 #    Description   ：  build.sh 被用于 ==> flume 源码编译为 jar
 # =========================================================================================
 

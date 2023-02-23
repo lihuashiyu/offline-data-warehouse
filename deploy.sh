@@ -3,8 +3,8 @@
 # =========================================================================================
 #    FileName      ：  deploy.sh
 #    CreateTime    ：  2023-02-23 23:07
-#    Author        ：  Issac_Al
-#    Email         ：  IssacAl@qq.com
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
 #    Description   ：  deploy.sh 被用于 ==> 对整体项目的构建，打包
 # =========================================================================================
 
