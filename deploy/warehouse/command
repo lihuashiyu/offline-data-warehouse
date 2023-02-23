@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+
+# 启动 kafka 生产者
+/opt/apache/kafka/bin/kafka-console-producer.sh
+
+
+# 启动 kafka 消费者
+/opt/apache/kafka/bin/kafka-console-consumer.sh
+
