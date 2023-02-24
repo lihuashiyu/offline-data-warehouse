@@ -2,7 +2,7 @@
 
 ## 1. 项目总体结构
 
-本项目基于 [**B站**](https://www.bilibili.com/) 上 [**尚硅谷离线数仓 5.0**](https://www.bilibili.com/video/BV1AT411j7hu/?vd_source=4840054c2f70d7736de5d9da8bed9fb2) 进行学习后的笔记整理，总体的目录结构如下：
+本项目基于 [**B站**](https://www.bilibili.com/) 上 [**尚硅谷离线数仓 5.0**](https://www.bilibili.com/video/BV1AT411j7hu/) 进行学习后的笔记整理，总体的目录结构如下：
 
 ```bash
     offline-data-warehouse
@@ -83,23 +83,23 @@
 ```bash
     # 使用 DataX 将生成的 业务数据全量同步到 HDFS，仅在项目部署完成后，初始化的的时候使用一次，后续无需再次操作，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
     mysql-hdfs
-     ├── activity_info.json
-     ├── activity_rule.json
-     ├── base_category1.json
-     ├── base_category2.json
-     ├── base_category3.json
-     ├── base_dic.json
-     ├── base_province.json
-     ├── base_region.json
-     ├── base_trademark.json
-     ├── cart_info.json
-     ├── coupon_info.json
+     ├── activity_info.json                                # 活动信息表，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.1  章节
+     ├── activity_rule.json                                # 活动规则表，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.2  章节
+     ├── base_category1.json                               # 一级分类表，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.6  章节
+     ├── base_category2.json                               # 二级分类表，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.7  章节
+     ├── base_category3.json                               # 三级分类表，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.8  章节
+     ├── base_dic.json                                     # 字典表，    详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.9  章节
+     ├── base_province.json                                # 省份表，    详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.10 章节
+     ├── base_region.json                                  # 地区表，    详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.11 章节
+     ├── base_trademark.json                               # 品牌表，    详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.12 章节
+     ├── cart_info.json                                    # 购物车表，  详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.13 章节
+     ├── coupon_info.json                                  # 优惠券信息，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.14 章节
      ├── GenerateMysqlHdfsJob.py                           # 使用 python 生成 DataX 的 mysql --> hdfs 的配置文件
      ├── mysql_hdfs.sh                                     # 该脚本调用 DataX  mysql 数据同步到 hdfs 
-     ├── sku_attr_value.json
-     ├── sku_info.json
-     ├── sku_sale_attr_value.json
-     └── spu_info.json                                                             
+     ├── sku_attr_value.json                               # SKU 平台属性值表，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.27 章节
+     ├── sku_info.json                                     # SKU 信息表，      详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.28 章节
+     ├── sku_sale_attr_value.json                          # SKU 销售属性表，  详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.29 章节
+     └── spu_info.json                                     # SPU 信息表，      详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.1.30 章节
 ```
 
 ### 3.5 mysql-kafka 模块
@@ -133,21 +133,21 @@
 ```bash
     # 将模拟生成的 用户行为日志 和 增量业务数据，通过 flume 同步到 hdfs，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 12.2 章节
     hdfs-mysql
-     ├── ads_activity_stats.json
-     ├── ads_coupon_stats.json
-     ├── ads_new_buyer_stats.json
-     ├── ads_order_by_province.json
-     ├── ads_page_path.json
-     ├── ads_repeat_purchase_by_tm.json
-     ├── ads_sku_cart_num_top3_by_cate.json
-     ├── ads_trade_stats_by_cate.json
-     ├── ads_trade_stats_by_tm.json
-     ├── ads_trade_stats.json
-     ├── ads_traffic_stats_by_channel.json
-     ├── ads_user_action.json
-     ├── ads_user_change.json
-     ├── ads_user_retention.json
-     ├── ads_user_stats.json
+     ├── ads_activity_stats.json                           # 最近30天发布的活动的补贴率，  详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.6.1 章节
+     ├── ads_coupon_stats.json                             # 最近30天发布的优惠券的补贴率，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.5.1 章节
+     ├── ads_new_buyer_stats.json                          # 新增交易用户统计，            详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.2.5 章节
+     ├── ads_order_by_province.json                        # 各省份交易统计，              详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.4.2 章节
+     ├── ads_page_path.json                                # 路径分析(页面单跳)，          详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.1.2 章节
+     ├── ads_repeat_purchase_by_tm.json                    # 最近7/30日各品牌复购率，      详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.3.1 章节
+     ├── ads_sku_cart_num_top3_by_cate.json                # 各分类商品购物车存量Top3，    详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.3.4 章节
+     ├── ads_trade_stats_by_cate.json                      # 各品类商品交易统计，          详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.3.3 章节
+     ├── ads_trade_stats_by_tm.json                        # 各品牌商品交易统计，          详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.3.2 章节
+     ├── ads_trade_stats.json                              # 交易综合统计，                详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.4.1 章节
+     ├── ads_traffic_stats_by_channel.json                 # 各渠道流量统计，              详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.1.1 章节
+     ├── ads_user_action.json                              # 用户行为漏斗分析，            详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.2.4 章节
+     ├── ads_user_change.json                              # 用户变动统计，                详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.2.1 章节
+     ├── ads_user_retention.json                           # 用户留存率，                  详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.2.2 章节
+     ├── ads_user_stats.json                               # 用户新增活跃统计，            详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.2.3 章节
      ├── GenerateHdfsMysql.py                              # 使用 python 生成 DataX 的 hdfs --> mysql 的配置文件
      └── hdfs_mysql.sh                                     # 该脚本调用 DataX 将 hdfs 数据同步到 mysql
 
@@ -232,8 +232,8 @@
 |   IP   | 192.168.100.100 | 192.168.100.111 | 192.168.100.122 | 192.168.100.133 |
 |  系统  | Rocky Linux 9.1 | Rocky Linux 9.1 | Rocky Linux 9.1 | Rocky Linux 9.1 |
 
+<br/>
 
-<br><br>
 <center>集群服务器规划</center>
 
 |     服务名称     | 版本号 |      子服务       | master | slaver1 | slaver2 | slaver3 |                              说明                              |
