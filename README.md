@@ -153,7 +153,7 @@
 
 ```
 
-### 3.9 sql 模块
+### 3.8 sql 模块
 
 ```bash
     # 数仓中各层之间的流转，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 7 到 12 章节
@@ -166,7 +166,7 @@
      └── ods.sql                                           # ODS 建表和插入数据用到的 hive-sql，第 7  章
 ```
 
-### 3.10 shell 模块
+### 3.9 shell 模块
 
 ```bash
     # 部署包的部署、初始化、组件启停，各模块启停脚本
@@ -177,42 +177,39 @@
      └── warehouse.sh                                      # 整个数据流向数仓的启停脚本
 ```
 
-### 3.11 warehouse 模块
+### 3.10 warehouse 模块
 
 ```bash
-    # 数仓中各层之间的流转脚本，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
+    # 数仓中各层之间的流转脚本，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 7 到 12 章节
     warehouse
-     ├── check_dim.sh
-     ├── check_dwd.sh
-     ├── check_ods.sh
-     ├── day_on_day.sh
-     ├── duplicate.sh
-     ├── dwd_dws_1d.sh
-     ├── dwd_dws_history.sh
-     ├── dwd_dws_nd.sh
-     ├── dws_ads.sh
-     ├── hdfs_ods_db.sh
-     ├── hdfs_ods_log.sh
-     ├── hdfs_to_ods_db_add.sh
-     ├── hdfs_to_ods_db_init.sh
-     ├── hdfs_to_ods_log.sh
-     ├── hive_on_spark.sh
-     ├── mysql_to_hdfs_add.sh
-     ├── mysql_to_hdfs_init.sh
-     ├── null_id.sh
-     ├── ods_dim_init.sh
-     ├── ods_dim.sh
-     ├── ods_dwd_init.sh
-     ├── ods_dwd.sh
-     ├── ods_to_dim_db_add.sh
-     ├── ods_to_dim_db_init.sh
-     ├── ods_to_dwd_db_add.sh
-     ├── ods_to_dwd_db_init.sh
-     ├── ods_to_dwd_log.sh
-     ├── range.sh
-     └── week_on_week.sh
-    
+     ├── dwd_dws_1d_init.sh                                # DWS 层 1 天初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.1.10 章节
+     ├── dwd_dws_1d.sh                                     # DWS 层 1 天       数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.1.10 章节
+     ├── dwd_dws_history_init.sh                           # DWS 层历史初始化  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.3.4  章节
+     ├── dwd_dws_history.sh                                # DWS 层历史        数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.3.4  章节
+     ├── dwd_dws_nd_init.sh                                # DWS 层 N 天初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.2.11 章节
+     ├── dwd_dws_nd.sh                                     # DWS 层 N 天       数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.2.11 章节
+     ├── dws_ads_init.sh                                   # ADS 层初始化      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  11.7   章节
+     ├── dws_ads.sh                                        # ADS 层初          数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  11.7   章节
+     ├── hdfs_ods_log.sh                                   # ODS 层行为日志    数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的   7.1   章节
+     ├── hdfs_ods_db.sh                                    # ODS 层业务数据表  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的   7.2   章节
+     ├── ods_dim_init.sh                                   # DIM 层初始化      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  8.7.1  章节
+     ├── ods_dim.sh                                        # DIM 层初每日      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  8.7.2  章节
+     ├── ods_dwd_init.sh                                   # DWD 层初始化      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 9.20.1  章节
+     └── ods_dwd.sh                                        # DWD 层初每日      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 9.20.2  章节
 ```
+
+### 3.11 view 模块
+
+```bash
+    # 数据可视化模块
+```
+
+### 3.12 schedule 模块
+
+```bash
+    # 总体流程的调度模块
+```
+
 
 <br/>
 
