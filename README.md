@@ -9,14 +9,15 @@
      ├── deploy                                            # 各个部署模块
      │     ├── file-kafka                                  # 使用 flume 监控【用户行为日志】，并同步到 kafka
      │     ├── hdfs-mysql                                  # 使用 datax 将 ads 层的数据同步到 mysql
-     │     ├── kafka-hdfs-db                               # 使用 flume 将 kafka 中的业务数据，同步到 hdfs
-     │     ├── kafka-hdfs-log                              # 使用 flume 将 kafka 中日志数据，同步到 hdfs
+     │     ├── kafka-hdfs                                  # 使用 flume 将 kafka 中的业务数据，同步到 hdfs
      │     ├── mock-db                                     # 模仿【用户行为】日志生成模块
      │     ├── mock-log                                    # 模仿【业务数据】生成模块
      │     ├── mysql-hdfs                                  # 使用 datax 将 MySQL 的全量数据，同步到 hdfs
      │     ├── mysql-kafka                                 # 使用 maxwell 监控 MySQL 增量数据，并同步到 kafka
+     │     ├── schedule                                    # 总体流程的调度模块
      │     ├── shell                                       # 项目的部署、组件启停、模块启停脚本
      │     ├── sql                                         # 整个离线数仓使用到的 mysql-sql，hive-sql，doris-sql
+     │     ├── view                                        # 数据可视化模块
      │     └── warehouse                                   # 数仓各层之间的调用脚本
      ├── deploy.sh                                         # 一键打包脚本
      ├── doc                                               # 尚硅谷相关文档
@@ -24,15 +25,17 @@
      └── README.md                                         # 项目说明文档                                                                
 ```
 
-
 <br/>
 
 ## 2. 项目架构图
 
+**<center>项目架构图</center>**
 
 ![项目架构图](doc/5-%E9%87%87%E9%9B%865.0%E6%9E%B6%E6%9E%84.png)
 
 <br/>
+
+**<center>项目部署图</center>**
 
 ![项目部署图](doc/6-%E9%87%87%E9%9B%865.0%E6%9E%B6%E6%9E%84.png)
 
@@ -59,10 +62,10 @@
 ```bash
     # 将生成的 用户行为日志 同步到 kafka，详见文档 offline-data-warehouse/doc/1-用户行为采集平台.docx 的 4.3 章节
     file-kafka
-     ├── position.json                                     # flume 监控本地文件产生的记录
      ├── file-kafka.conf                                   # flume 监控本地文件的配置文件
      ├── file-kafka.sh                                     # 启停脚本
-     └── flume-1.0.jar                                     # 执行 offline-data-warehouse/flume/build.sh 生成的 jar，用于拦截不规则数据
+     ├── flume-1.0.jar                                     # 执行 offline-data-warehouse/flume/build.sh 生成的 jar，用于拦截不规则数据
+     └── position.json                                     # flume 监控本地文件产生的记录
 ```
 
 ### 3.3 mock-db 模块
@@ -150,7 +153,6 @@
      ├── ads_user_stats.json                               # 用户新增活跃统计，            详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.2.3 章节
      ├── GenerateHdfsMysql.py                              # 使用 python 生成 DataX 的 hdfs --> mysql 的配置文件
      └── hdfs_mysql.sh                                     # 该脚本调用 DataX 将 hdfs 数据同步到 mysql
-
 ```
 
 ### 3.8 sql 模块
@@ -174,7 +176,9 @@
      ├── component.sh                                      # 各个大数据组件的启停脚本
      ├── init.sh                                           # 部署完成后，一键初始化
      ├── install.sh                                        # 一键部署脚本
-     └── warehouse.sh                                      # 整个数据流向数仓的启停脚本
+     ├── warehouse.sh                                      # 整个数据流向数仓的启停脚本
+     ├── xcall.sh                                          # 在多台服务器执行命令，并查看结果
+     └── xync.sh                                           # 文件同步脚本 
 ```
 
 ### 3.10 warehouse 模块
