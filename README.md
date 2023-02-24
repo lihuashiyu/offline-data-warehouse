@@ -15,6 +15,7 @@
      │     ├── mock-log                                    # 模仿【业务数据】生成模块
      │     ├── mysql-hdfs                                  # 使用 datax 将 MySQL 的全量数据，同步到 hdfs
      │     ├── mysql-kafka                                 # 使用 maxwell 监控 MySQL 增量数据，并同步到 kafka
+     │     ├── shell                                       # 项目的部署、组件启停、模块启停脚本
      │     ├── sql                                         # 整个离线数仓使用到的 mysql-sql，hive-sql，doris-sql
      │     └── warehouse                                   # 数仓各层之间的调用脚本
      ├── deploy.sh                                         # 一键打包脚本
@@ -33,17 +34,17 @@
 
 <br/>
 
-![项目部署图](doc/5-%E9%87%87%E9%9B%865.0%E6%9E%B6%E6%9E%84.png)
+![项目部署图](doc/6-%E9%87%87%E9%9B%865.0%E6%9E%B6%E6%9E%84.png)
 
 <br/>
 
-## 3. 项目模块说明
+## 3. deploy 打包后的项目模块说明
 
 ### 3.1 mock-log 模块
 
 ```bash
-    # 模拟生成用户行为日志，详见文档 offline-data-warehouse/doc/1-用户行为采集平台.docx 的 3.3 章节
-    mock-log/
+    # 模拟 生成用户行为日志，详见文档 offline-data-warehouse/doc/1-用户行为采集平台.docx 的 3.3 章节
+    mock-log
      ├── application.yml                                   # mock-log 的配置文件                                       
      ├── cycle.sh                                          # 该脚本调用 mock-log.sh，进行循环生成，默认 10 次
      ├── log                                               # 运行产生的日志目录
@@ -56,8 +57,8 @@
 ### 3.2 file-kafka 模块
 
 ```bash
-    # 模拟生成用户行为日志，详见文档 offline-data-warehouse/doc/1-用户行为采集平台.docx 的 4.3 章节
-    file-kafka/
+    # 将生成的 用户行为日志 同步到 kafka，详见文档 offline-data-warehouse/doc/1-用户行为采集平台.docx 的 4.3 章节
+    file-kafka
      ├── position.json                                     # flume 监控本地文件产生的记录
      ├── file-kafka.conf                                   # flume 监控本地文件的配置文件
      ├── file-kafka.sh                                     # 启停脚本
@@ -67,8 +68,8 @@
 ### 3.3 mock-db 模块
 
 ```bash
-    # 模拟生成用户行为日志，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.2 章节
-    mock-db/
+    # 模拟 生成业务数据，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.2 章节
+    mock-db
      ├── application.properties                            # mock-db 的配置文件
      ├── cycle.sh                                          # 该脚本调用 mock-log.sh，进行循环生成，默认 10 次
      ├── data.sql                                          # 模拟 mysql 数据库原始的数据
@@ -80,7 +81,7 @@
 ### 3.4 mysql-hdfs 模块
 
 ```bash
-    # 使用 DataX 将表中的数据全量同步到 HDFS，仅在项目部署的时候使用一次，后续无需再次操作，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
+    # 使用 DataX 将生成的 业务数据全量同步到 HDFS，仅在项目部署完成后，初始化的的时候使用一次，后续无需再次操作，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
     mysql-hdfs
      ├── activity_info.json
      ├── activity_rule.json
@@ -104,7 +105,7 @@
 ### 3.5 mysql-kafka 模块
 
 ```bash
-    # 用于监控 Mysql，当 mock-db 在 Mysql 中产生增量数据时，将增量数据同步到 kafka，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
+    # 使用 MaxWell 监控 Mysql，用于将产生的 增量业务数据 同步到 kafka，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.3 章节
     mysql-kafka 
      ├── config.properties                                 # MaxWell 监控 Mysql 的配置文件
      ├── meta.sql                                          # MaxWell 监控时，在数据库创建的表
@@ -112,31 +113,26 @@
      └── mysql_kafka_init.sh                               # 初始化所有的增量表，只需安装时执行
 ```
 
-### 3.6 kafka-hdfs-log 模块
+### 3.6 kafka-hdfs 模块
 
 ```bash
-    # 用于监控 Mysql，当 mock-db 在 Mysql 中产生增量数据时，将增量数据同步到 kafka，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
-    kafka-hdfs-log
-     ├── data                                              # flume 同步过程中产生的数据存储目录
-     ├── check-point                                       # 保存的检查点数据
-     ├── kafka-hdfs-log.conf                               # 用户行为 同步到 hdfs 的配置文件
-     └── kafka-hdfs-log.sh                                 # 用户行为同步启停脚本
+    # 将模拟生成的 用户行为日志 和 增量业务数据，通过 flume 同步到 hdfs，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.3 章节
+    kafka-hdfs
+     ├── db-data                                           # flume 同步过程中产生的数据存储目录
+     ├── db-check-point                                    # 保存的 增量业务数据 检查点数据
+     ├── log-data                                          # flume 同步过程中产生的数据存储目录
+     ├── log-check-point                                   # 保存的 用户行为日志 检查点数据
+     ├── kafka-hdfs.sh                                     # 增量业务数据 和 用户行为日志 同步启停脚本
+     ├── kafka-hdfs-db.conf                                # 增量业务数据 同步到 hdfs 的配置文件
+     ├── kafka-hdfs-db.sh                                  # 增量业务数据 同步启停脚本
+     ├── kafka-hdfs-log.conf                               # 用户行为日志 同步到 hdfs 的配置文件
+     └── kafka-hdfs-log.sh                                 # 用户行为日志 同步启停脚本
 ```
 
-### 3.7 kafka-hdfs-db 模块
-
+### 3.7 hdfs-mysql 模块
 ```bash
-    # 用于监控 Mysql，当 mock-db 在 Mysql 中产生增量数据时，将增量数据同步到 kafka，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
-    kafka-hdfs-log
-     ├── data                                              # flume 同步过程中产生的数据存储目录
-     ├── check-point                                       # 保存的检查点数据
-     ├── kafka-hdfs-log.conf                               # 业务数据 同步到 hdfs 的配置文件
-     └── kafka-hdfs-log.sh                                 # 业务数据 同步启停脚本
-```
-
-### 3.8 hdfs-mysql 模块
-```bash
-    hdfs-mysql/
+    # 将模拟生成的 用户行为日志 和 增量业务数据，通过 flume 同步到 hdfs，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 12.2 章节
+    hdfs-mysql
      ├── ads_activity_stats.json
      ├── ads_coupon_stats.json
      ├── ads_new_buyer_stats.json
@@ -160,21 +156,21 @@
 ### 3.9 sql 模块
 
 ```bash
-    # 使用 DataX 将 Hive ADS 层的表数据同步到 mysql，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
+    # 数仓中各层之间的流转，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 7 到 12 章节
     sql
-     ├── ads.sql                                           # ADS 建表和插入数据用到的 hive-sql
-     ├── dim.sql                                           # DIM 建表和插入数据用到的 hive-sql
-     ├── dwd.sql                                           # DWD 建表和插入数据用到的 hive-sql
-     ├── dws.sql                                           # DWS 建表和插入数据用到的 hive-sql
-     ├── export.sql                                        # ADS 层导出到 mysql 的建表语句
-     └── ods.sql                                           # ODS 建表和插入数据用到的 hive-sql
+     ├── ads.sql                                           # ADS 建表和插入数据用到的 hive-sql，第 11 章
+     ├── dim.sql                                           # DIM 建表和插入数据用到的 hive-sql，第 8  章
+     ├── dwd.sql                                           # DWD 建表和插入数据用到的 hive-sql，第 9  章
+     ├── dws.sql                                           # DWS 建表和插入数据用到的 hive-sql，第 10 章
+     ├── export.sql                                        # ADS 层导出到 mysql 的建表语句    ，第 12 章
+     └── ods.sql                                           # ODS 建表和插入数据用到的 hive-sql，第 7  章
 ```
 
 ### 3.10 shell 模块
 
 ```bash
-    # 使用 DataX 将 Hive ADS 层的表数据同步到 mysql，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
-    warehouse/
+    # 部署包的部署、初始化、组件启停，各模块启停脚本
+    shell
      ├── component.sh                                      # 各个大数据组件的启停脚本
      ├── init.sh                                           # 部署完成后，一键初始化
      ├── install.sh                                        # 一键部署脚本
@@ -184,12 +180,11 @@
 ### 3.11 warehouse 模块
 
 ```bash
-    # 使用 DataX 将 Hive ADS 层的表数据同步到 mysql，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
+    # 数仓中各层之间的流转脚本，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 3.2 章节
     warehouse
      ├── check_dim.sh
      ├── check_dwd.sh
      ├── check_ods.sh
-     ├── command
      ├── day_on_day.sh
      ├── duplicate.sh
      ├── dwd_dws_1d.sh
@@ -228,13 +223,14 @@
 
 <center>服务器基本信息</center>
 
-|        |      master      |     slaver1      |     slaver2      |     slaver3      |
-|:------:|:----------------:|:----------------:|:----------------:|:----------------:|
-|  CPU   |       4C/8T      |       4C/8T      |       4C/8T      |       4C/8T      |
-|  内存  |   16GB/3200MHz   |   16GB/3200MHz   |   16GB/3200MHz   |   16GB/3200MHz   |
-|  硬盘  |     HDD 40GB     |     HDD 40GB     |     HDD 40GB     |     HDD 40GB     |
-|  网卡  |     1000Mbps     |     1000Mbps     |     1000Mbps     |     1000Mbps     |
-|  系统  | Rocky Linux 9.1  | Rocky Linux 9.1  | Rocky Linux 9.1  | Rocky Linux 9.1  |
+|        |     master      |     slaver1     |     slaver2     |     slaver3     |
+|:------:|:---------------:|:---------------:|:---------------:|:---------------:|
+|  CPU   |      4C/8T      |      4C/8T      |      4C/8T      |      4C/8T      |
+|  内存  |  16GB/3200MHz   |  16GB/3200MHz   |  16GB/3200MHz   |  16GB/3200MHz   |
+|  硬盘  |    HDD 40GB     |    HDD 40GB     |    HDD 40GB     |    HDD 40GB     |
+|  网卡  |    1000Mbps     |    1000Mbps     |    1000Mbps     |    1000Mbps     |
+|   IP   | 192.168.100.100 | 192.168.100.111 | 192.168.100.122 | 192.168.100.133 |
+|  系统  | Rocky Linux 9.1 | Rocky Linux 9.1 | Rocky Linux 9.1 | Rocky Linux 9.1 |
 
 
 <br><br>
@@ -280,11 +276,11 @@
     # 1. 拉取项目，并进行构建
     git clone https://github.com/lihuashiyu/offline-data-warehouse.git         # 使用 git 将仓库中的代码和文件克隆到本地 
     cd offline-data-warehouse/ || exit                                         # 进入项目
-    ./build.sh                                                                 # 在项目的根目录下，进行构建项目，并将项目上传到服务器
+    ./deploy.sh                                                                # 在项目的根目录下，进行构建项目，并将部署包上传到服务器
     
     # 2. 登录 master 服务器，然后将部署包上传到 master 服务器用户的 家目录
     cd ~ || exit                                                               # 进入用户家目录
-    tar -zxvf ~/offline-data-warehouse-1.0.tar.gz                                  # 解压部署包
+    tar -zxvf ~/offline-data-warehouse-1.0.tar.gz                              # 解压部署包
     
     # 3. 进行集群部署
     cd ~/offline-data-warehouse  || exit                                       # 进入部署路径
@@ -293,7 +289,7 @@
     # 4. 部署后初始化
     ~/offline-data-warehouse/shell/init.sh                                     # 执行初始化脚本，进行多台服务器部署完后初始化
     
-    # 5. 一键启动，将生成的数据库数据、日志数据，同步到 HDFS 的 /hive/tmp/warehouse （注意：此脚本只适用于增量同步）
+    # 5. 一键启动，将模拟生成的 业务数据、用户行为日志，同步到 HDFS 的 /hive/tmp/warehouse （注意：此脚本只适用于增量同步）
     ~/offline-data-warehouse/shell/warer-house.sh start                        # 执行部署脚本，进行多台服务器部署
     
     # 6. 查看数据是否同步成功
