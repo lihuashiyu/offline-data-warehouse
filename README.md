@@ -74,7 +74,7 @@
     # 模拟 生成业务数据，详见文档 offline-data-warehouse/doc/2-业务数据采集平台.docx 的 2.2 章节
     mock-db
      ├── application.properties                            # mock-db 的配置文件
-     ├── cycle.sh                                          # 该脚本调用 mock-log.sh，进行循环生成，默认 10 次
+     ├── cycle.sh                                          # 该脚本调用 mock-db.sh，进行循环生成，默认 10 次
      ├── data.sql                                          # 模拟 mysql 数据库原始的数据
      ├── mock-db.jar                                       # 执行的 jar，修改过尚硅谷原始的 jar，已经支持 mysql 8.0.x
      ├── mock-db.sh                                        # mock-db 模块的启停脚本
@@ -134,7 +134,7 @@
 
 ### 3.7 hdfs-mysql 模块
 ```bash
-    # 将模拟生成的 用户行为日志 和 增量业务数据，通过 flume 同步到 hdfs，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 12.2 章节
+    # 将 ADS 层数据导出到 Mysql，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 12.2 章节
     hdfs-mysql
      ├── ads_activity_stats.json                           # 最近30天发布的活动的补贴率，  详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.6.1 章节
      ├── ads_coupon_stats.json                             # 最近30天发布的优惠券的补贴率，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 11.5.1 章节

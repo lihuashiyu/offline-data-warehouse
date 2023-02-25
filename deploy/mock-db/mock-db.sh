@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-
+# =========================================================================================
+#    FileName      ：  mock-db.sh
+#    CreateTime    ：  2023-02-24 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  mock-db.sh 被用于 ==> 模拟 生成业务数据 的启停脚本
+# =========================================================================================
+    
+    
+模拟 生成业务数据
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 程序位置
 SERVICE_NAME=mock-db.jar                                   # 程序名称
 ALIAS_NAME=mock-db                                         # 程序别名
@@ -10,8 +19,6 @@ LOG_FILE=mock-db.log                                       # 程序运行日志�
 USER=$(whoami)                                             # 服务运行用户
 RUN_STATUS=1                                               # 服务运行状态
 STOP_STATUS=0                                              # 服务停止状态
-#jar -xvf mock-db.jar
-#jar -cfM0 mock-db.jar BOOT-INF/ META-INF/ org/
 
 
 # 生成业务数据的日期

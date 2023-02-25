@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# =========================================================================================
+#    FileName      ：  mock-log.sh
+#    CreateTime    ：  2023-02-24 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  mock-log.sh 被用于 ==> 模拟 生成用户行为日志 的启停脚本
+# =========================================================================================
+    
+    
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 程序位置
 # SERVICE_NAME=gmall2020-mock-log-2021-01-22.jar           
 SERVICE_NAME=mock-log.jar                                  # 程序名称

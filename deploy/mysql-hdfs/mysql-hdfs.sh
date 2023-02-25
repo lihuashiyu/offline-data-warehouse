@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
-
-
+    
+# =========================================================================================
+#    FileName      ：  mysql-hdfs.sh
+#    CreateTime    ：  2023-02-24 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  mysql-hdfs.sh 被用于 ==> DataX 将生成的 业务数据 全量同步到 HDFS，
+#                                                   仅在项目部署完成后，初始化时使用，
+#                                                   后续无需再次操作
+# =========================================================================================
+    
+    
 DATAX_DIR=/opt/github/datax                                # Datax 安装路径
 HADOOP_DIR=/opt/apache/hadoop                              # Hadoop 路径
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 程序位置

@@ -5,7 +5,7 @@
 #    CreateTime    ：  2023-02-24 02:27
 #    Author        ：  lihua shiyu
 #    Email         ：  lihuashiyu@github.com
-#    Description   ：  xcall.sh 被用于 ==> 统一命令，在查看集群中执行
+#    Description   ：  xcall.sh 被用于 ==> 在集群中查看服务器执行，命令后的返回状况
 # =========================================================================================
 
 

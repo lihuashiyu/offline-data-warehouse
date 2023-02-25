@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
-
-
+    
+# =========================================================================================
+#    FileName      ：  mysql-hdfs.sh
+#    CreateTime    ：  2023-02-24 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  mysql-hdfs.sh 被用于 ==> 使用 MaxWell 监控 Mysql，用于将产生的 
+#                                                   增量业务数据 同步到 kafka
+# =========================================================================================
+    
+    
 MAXWELL_DIR=/opt/github/maxwell                            # MaxWell 安装路径
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
 PROFILE=config.properties                                  # 配置文件
@@ -111,14 +120,14 @@ case $1 in
 
     # 5. 其它情况
     *)
-        echo "    脚本可传入一个参数，如下所示：            "
+        echo "    脚本可传入一个参数，如下所示：          "
         echo "        +---------------------------------+ "
         echo "        | start | stop | restart | status | "
         echo "        +---------------------------------+ "
-        echo "        |      start    ：  启动服务      |  "
-        echo "        |      stop     ：  关闭服务      |  "
-        echo "        |      restart  ：  重启服务      |  "
-        echo "        |      status   ：  查看状态      |  "
+        echo "        |      start    ：  启动服务      | "
+        echo "        |      stop     ：  关闭服务      | "
+        echo "        |      restart  ：  重启服务      | "
+        echo "        |      status   ：  查看状态      | "
         echo "        +---------------------------------+ "
     ;;
 esac

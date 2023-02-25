@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-
+# =========================================================================================
+#    FileName      ：  hdfs-mysql.sh
+#    CreateTime    ：  2023-02-24 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  hdfs-mysql.sh 被用于 ==> 将 ADS 层数据导出到 Mysql  
+# =========================================================================================
+    
+    
 DATAX_DIR=/opt/github/datax                                # Datax 安装路径
 HADOOP_DIR=/opt/apache/hadoop                              # Hadoop 路径
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 程序位置

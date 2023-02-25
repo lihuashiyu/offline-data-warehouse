@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# =========================================================================================
+#    FileName      ：  file-kafka.sh
+#    CreateTime    ：  2023-02-24 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  file-kafka.sh 被用于 ==> 将生成的 用户行为日志 同步到 kafka
+# =========================================================================================
+
+
 FLUME_NG=/opt/apache/flume                                 # flume 安装路径
 FLUME_PORT=44444                                           # flume 占用端口号
 SERVICE_DIR=$(cd $(dirname "$0") || exit; pwd)             # 需要执行的服务路径

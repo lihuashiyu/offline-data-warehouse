@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
-
+    
+# =========================================================================================
+#    FileName      ：  kafka-hdfs-db.sh
+#    CreateTime    ：  2023-02-24 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  kafka-hdfs-db.sh 被用于 ==> 使用 flume 将模拟生成的 业务数据，
+#                                                       从 kafka 同步到 hdfs
+# =========================================================================================
+    
+    
 FLUME_NG=/opt/apache/flume                                 # flume 安装路径
 FLUME_PORT=44444                                           # flume 占用端口号
 SERVICE_DIR=$(cd $(dirname "$0") || exit; pwd)             # 需要执行的服务路径
@@ -8,7 +18,6 @@ CONF_FILE=kafka-hdfs-db.conf                                  # 配置文件
 
 KAFKA_URL="issac:9092"                                     # Kafka 连接 url
 KAFKA_TOPIC="cart_info,comment_info,coupon_use,favor_info,order_detail_activity,order_detail_coupon,order_detail,order_info,order_refund_info,order_status_log,payment_info,refund_payment,user_info"                                         # Kafka 主题
-# HDFS_PATH="/warehouse/origin/db/%{topic}_inc/%Y-%m-%d"     # 监控数据源路径
 HDFS_PATH="/warehouse/origin/db/%{topic}_inc/2021-08-15"     # 监控数据源路径
 INTERCEPTOR_JAR=flume-1.0.jar                              # Flume 拦截器 jar 包
 INTERCEPTOR_NAME=interceptor.TimeInterceptor\$Builder      # Flume 拦截器 类名
