@@ -6,9 +6,9 @@
     ProjectName   ：  Sql 
     FileName      ：  GenerateImportDatacConfig 
     CreateTime    ：  2022/7/31 15:40:36 
-    Author        ：  Issac_Al 
-    Email         ：  IssacAl@qq.com 
-    PythonCompiler：  3.9.9 
+    Author        ：  lihua shiyu 
+    Email         ：  lihuashiyu@github.com 
+    PythonCompiler：  3.9.13
     IDE           ：  PyCharm 2020.3.4 
     Version       ：  1.0 
     Description   ：  文件描述 
@@ -20,7 +20,7 @@ import MySQLdb
 
 
 # MySQL 相关配置，需根据实际情况作出修改
-mysql_host = "issac"
+mysql_host = "master"
 mysql_port = "3306"
 mysql_user = "issac"
 mysql_passwd = "111111"

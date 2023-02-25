@@ -1,3 +1,7 @@
+drop database if exists at_gui_gu;
+create database if not exists at_gui_gu;
+use at_gui_gu;
+
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for activity_info
 -- -------------------------------------------------------------------------------------------------

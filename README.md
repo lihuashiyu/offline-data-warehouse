@@ -165,6 +165,7 @@
      ├── dwd.sql                                           # DWD 建表和插入数据用到的 hive-sql，第 9  章
      ├── dws.sql                                           # DWS 建表和插入数据用到的 hive-sql，第 10 章
      ├── export.sql                                        # ADS 层导出到 mysql 的建表语句    ，第 12 章
+     ├── hive.sql                                          # 整个数仓中所有表的建表语句
      └── ods.sql                                           # ODS 建表和插入数据用到的 hive-sql，第 7  章
 ```
 
@@ -185,6 +186,7 @@
 
 ```bash
     # 数仓中各层之间的流转脚本，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 7 到 12 章节
+    # *._init.sh 仅在数仓初始化的时候使用，用于同步历史数据
     warehouse
      ├── dwd_dws_1d_init.sh                                # DWS 层 1 天初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.1.10 章节
      ├── dwd_dws_1d.sh                                     # DWS 层 1 天       数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.1.10 章节
