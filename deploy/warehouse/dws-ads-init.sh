@@ -16,7 +16,7 @@ fi
 printf "\n============================== 运行开始 ==============================\n"
 case $1 in
     "ads_activity_stats")
-        hive -e "$ads_activity_stats"
+        hive -e "${ads_activity_stats}"
     ;;
     
     "ads_coupon_stats")

@@ -2,19 +2,21 @@
 
 
 # 定义变量方便修改
-SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
 HIVE_DATA_BASE=warehouse                                   # Hive 的数据库名称
-HDFS_DB_PATH=/warehouse/origin/db                          # 需要同步的数据库数据，在 HDFS 的路径
-LOG_FILE="hdfs_ods_db-$(date +%F-%H-%M-%S).log"            # 执行日志
-LOG_FILE=hdfs_ods_db.log                                   # 执行日志
+MOCK=mock                                                  # 日志名称
+WARE_HOUSE_DIR=/warehouse/origin                           # 日志在 HDFS 上的路径
 
 
 # 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天
-if [ -n "$2" ] ;then
-    do_date=$2
+if [ -n "$1" ] ;then
+    do_date=$1
 else
     do_date=$(date -d "-1 day" +%F)
 fi
+
+echo "======================================== 日志日期为 ${do_date} ========================================"
+sql="load data inpath '${WARE_HOUSE_DIR}/${MOCK}/${do_date}' into table ${HIVE_DATA_BASE}.ods_log_inc partition(dt='${do_date}');"
+hive -e "${sql}"
 
 
 function load_data()
@@ -31,7 +33,7 @@ function load_data()
         fi
     done
     
-    hive -e "${sql}" >> "$SERVICE_DIR/$LOG_FILE"
+    hive -e "${sql}" >> "${SERVICE_DIR}/${LOG_FILE}"
 }
 
 

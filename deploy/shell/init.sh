@@ -28,19 +28,44 @@ ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111  < "${PROJECT_DIR}/mock
 ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111  < "${PROJECT_DIR}/mock-db/data.sql"  || exit >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
 # 3. 在 Hive 中创建所有的 ODS、DIM、DWD、DWS、ADS 表
-"${MYSQL_HOME}/bin/hive" -f "${PROJECT_DIR}/sql/hive.sql" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+"${HIVE_HOME}/bin/hive" -f "${PROJECT_DIR}/sql/hive.sql" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
-# 4. 将 Mysql 中的 维表数据 通过 DataX 同步到 hdfs
-"${PROJECT_DIR}/mysql-hdfs/mysql-hdfs.sh start" 
+# 4. 将用户行为日志导出到 kafka   
+# "${PROJECT_DIR}/file-hdfs/mysql-hdfs.sh start"          >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
+# 5. 将 Mysql 中的 维表数据 通过 DataX 同步到 hdfs
+"${PROJECT_DIR}/mysql-hdfs/mysql-hdfs.sh start"          >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
-# 2. 遍历循环读取主机 ${HOST_LIST[@]}
-for host_name in "${HOST_LIST[@]}"
-do
-    
-    echo "============================== 向主机（${host_name}）同步数据 =============================="    
-    ssh "${USER}@${host_name}" "mkdir -p ${PROJECT_DIR}; exit "
-    
-    # 执行同步
-    rsync -zav --delete  "${PROJECT_DIR}"  "${USER}@${host_name}:${PROJECT_DIR}"
-done
+# 6. 将 Mysql 中的 实时数据 通过 maxwell 同步到 kafka
+"${PROJECT_DIR}/mysql-hdfs/mysql-hdfs.sh start"          >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 7. 将 kafka 中的 用户行为日志 和 业务实时数据 同步到 hdfs
+"${PROJECT_DIR}/mysql-hdfs/kafka-hdfs-log.sh start"          >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+"${PROJECT_DIR}/mysql-hdfs/kafka-hdfs-db.sh start"          >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 8. 将 HDFS 的数据加载到 Hive 的 ODS
+
+# 2. HDFS ----> ODS
+echo "======================================= HDFS -----> ODS ========================================"
+"${PROJECT_DIR}/warehouse/hdfs-ods-log.sh" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+"${PROJECT_DIR}/warehouse/hdfs-ods-db.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 3. ODS ----> DWD
+echo "======================================== ODS -----> DWD ========================================"
+"${PROJECT_DIR}/warehouse/ods-dwd-init.sh" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 4. DWD ----> DWS
+echo "======================================== DWD ----> DWS ========================================"
+"${PROJECT_DIR}/warehouse/dwd-dws-init.sh" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 5. DWS ----> ADS
+echo "======================================== DWS ----> ADS ========================================"
+"${PROJECT_DIR}/warehouse/dws-ads-init.sh" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 6. ADS ----> Mysql
+echo "======================================= ADS ----> Mysql ======================================="
+"${PROJECT_DIR}/hdfs-mysql/hdfs-mysql.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 6. ADS ----> Mysql
+echo "========================================== 完成退出 ==========================================="
+exit 0

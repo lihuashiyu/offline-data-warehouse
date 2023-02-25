@@ -14,8 +14,7 @@ fi
 
 dim_user_zip="
     set hive.exec.dynamic.partition.mode=nonstrict;
-    with
-    tmp as
+    with tmp as
     (
         select old.id old_id,
                old.login_name old_login_name,
