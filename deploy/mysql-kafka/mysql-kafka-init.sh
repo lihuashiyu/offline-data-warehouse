@@ -5,25 +5,24 @@
 #    CreateTime    ：  2023-02-24 01:44
 #    Author        ：  lihua shiyu
 #    Email         ：  lihuashiyu@github.com
-#    Description   ：  mysql-kafka-init.sh 被用于 ==> 该脚本的作用是初始化所有的增量表，
+#    Description   ：  mysql-kafka-init.sh 被用于 ==> 该脚本的作用是初始化所有维度表，
 #                                                         只需执行一次
 # =========================================================================================
     
     
-MAXWELL_DIR=/opt/github/maxwell                            # MaxWell 安装路径
+MAXWELL_HOME=/opt/github/maxwell                           # MaxWell 安装路径
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
 DATA_BASE=at_gui_gu                                        # 需要同步的数据库
-LOG_FILE=mysql_kafka_init.log                              # 操作日志存储
-# LOG_FILE=$(date +%F-%H-%M-%S).log            a            # 操作日志存储
+LOG_FILE="mysql-kafka-init-$(date +%F).log"                # 操作日志存储
 
 
 function import_data()
 {
-    echo "    开始同步表： ${1} ...."
-    "${MAXWELL_DIR}/bin/maxwell-bootstrap" --database ${DATA_BASE} \
-                                           --table "${1}" \
-                                           --config "${SERVICE_DIR}/config.properties" \
-                                           >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1 &
+    echo "    开始同步表： $1 ...."
+    "${MAXWELL_HOME}/bin/maxwell-bootstrap" --database ${DATA_BASE} \
+                                            --table "$1" \
+                                            --config "${SERVICE_DIR}/config.properties" \
+                                            >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
 }
 
 
@@ -98,4 +97,4 @@ case $1 in
     ;;
 esac
 printf "=================================== 运行结束 ===================================\n\n"
-
+exit 0

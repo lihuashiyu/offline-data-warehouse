@@ -10,38 +10,53 @@
 # =========================================================================================
     
     
-MAXWELL_DIR=/opt/github/maxwell                            # MaxWell 安装路径
+MAX_WELL_HOME=/opt/github/maxwell                          # MaxWell 安装路径
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
+SERVICE_NAME=com.zendesk.maxwell.Maxwell                   # MaxWell jar 名字
+ALIAS_NAME="Mysql -> MaxWell -> Kafka"                     # 程序别名
 PROFILE=config.properties                                  # 配置文件
-ALIAS_NAME=MaxWell                                         # 程序别名
-JUDGE_NAME=com.zendesk.maxwell.Maxwell                     # MaxWell jar 名字
-
-LOG_FILE=mysql_kafka_inc.log                               # 操作日志存储
+LOG_FILE="mysql-kafka-$(date +%F).log"                     # 操作日志存储
 # LOG_FILE=$(date +%F-%H-%M-%S).log                        # 操作日志存储
+
+USER=$(whoami)                                             # 服务运行用户
+RUN_STATUS=1                                               # 服务运行状态
+STOP_STATUS=0                                              # 服务停止状态
 FULL=$2
 
 
+# 服务状态检测
 function service_status()
 {
-    pid_count=$(ps -aux | grep ${JUDGE_NAME} | grep "${SERVICE_DIR}/${PROFILE}" | grep -v grep  | grep -v "$0" | wc -l)
-    echo "${pid_count}"
+    # 1. 获取 pid 个数
+    pid_count=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_NAME}" | grep "${SERVICE_DIR}/${PROFILE}" | grep -v grep  | grep -v "$0" | wc -l)
+    
+    # 2. 判断程序循行状态
+    if [ "${pid_count}" -eq 1 ]; then
+        echo "${RUN_STATUS}"
+    elif [ "${pid_count}" -le 1 ]; then
+        echo "${STOP_STATUS}"
+    else
+        echo "    查看程序是否有重复使用的状况 ......"
+    fi
 }
 
-
+# 服务启动
 function service_start()
 {
-    # 1.1 统计正在运行程序的 pid 的个数
+    # 1. 统计正在运行程序的 pid 的个数
     pc=$(service_status)
+    
+    # 2. 判断程序的状态
     if [[ ${pc} -lt 1 ]]; then
-        # 1.2 判断是否为全量同步数据
+        # 2.1 判断是否为全量同步数据
         if [ "${FULL}" == "all" ]; then
-            ${MAXWELL_DIR}/bin/maxwell-bootstrap --database at_gui_gu \
-                                                 --table user_info \
-                                                 --config "${SERVICE_DIR}/${PROFILE}" \
-                                                 >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
+            ${MAX_WELL_HOME}/bin/maxwell-bootstrap --database at_gui_gu \
+                                                   --table user_info \
+                                                   --config "${SERVICE_DIR}/${PROFILE}" \
+                                                   >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
         else
-            ${MAXWELL_DIR}/bin/maxwell --config "${SERVICE_DIR}/${PROFILE}" \
-                                       --daemon >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1             
+            ${MAX_WELL_HOME}/bin/maxwell --config "${SERVICE_DIR}/${PROFILE}" \
+                                         --daemon >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1             
         fi
         
         echo "    程序（${ALIAS_NAME}）正在启动中 ......"
@@ -61,7 +76,7 @@ function service_start()
     fi
 }
 
-
+# 服务停止
 function service_stop()
 {
     # 1 统计正在运行程序的 pid 的个数
@@ -69,7 +84,7 @@ function service_stop()
     if [ "${pc}" -eq 0 ]; then
         echo "    程序（${ALIAS_NAME}）进程不存在，未在运行 ......"
     else
-        temp=$(ps -aux | grep ${JUDGE_NAME} | grep "${SERVICE_DIR}/${PROFILE}" | grep -v grep  | grep -v "$0" | awk '{print $2}' | xargs kill -15)
+        temp=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_NAME}" | grep -i "${SERVICE_DIR}/${PROFILE}" | grep -v grep  | grep -v "$0" | awk '{print $2}' | xargs kill -15)
         echo "    程序（${ALIAS_NAME}）正在停止 ......"
         
         sleep 2
@@ -78,16 +93,15 @@ function service_stop()
         
         pcn=$(service_status)
         if [ "${pcn}" -gt 0 ]; then
-           tmp=$(ps -aux | grep ${JUDGE_NAME} | grep "${SERVICE_DIR}/${PROFILE}" | grep -v grep  | grep -v "$0" | awk '{print $2}' | xargs kill -9) 
+           tmp=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_NAME}" | grep -i "${SERVICE_DIR}/${PROFILE}" | grep -v grep  | grep -v "$0" | awk '{print $2}' | xargs kill -9) 
         fi 
         echo "    程序（${ALIAS_NAME}）已经停止 ......"
     fi
 }
 
 
-printf "\n=========================================================================\n"
+printf "\n================================================================================\n"
 #  匹配输入参数
-
 case $1 in
     # #  1. 启动程序
     start )
@@ -105,16 +119,19 @@ case $1 in
         pc=$(service_status)
 
         #  3.2 判断运行状态
-        if [ "${pc}" -gt 0 ]; then
+        if [ "${pc}" == "${RUN_STATUS}" ]; then
             echo "    程序（${ALIAS_NAME}）正在运行中 ......"
-        else
+        elif [ "${pc}" == "${RUN_STATUS}" ]; then
             echo "    程序（${ALIAS_NAME}）已经停止 ......"
+        else
+            echo "${pc}"
         fi
     ;;
 
     # 4. 重启程序
     restart )
        service_stop
+       sleep 1
        service_start
     ;;
 
@@ -131,5 +148,5 @@ case $1 in
         echo "        +---------------------------------+ "
     ;;
 esac
-printf "=========================================================================\n\n"
-    
+printf "================================================================================\n\n"
+exit 0

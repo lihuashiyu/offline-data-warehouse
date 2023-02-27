@@ -13,12 +13,11 @@ mock.type: "log"
 # mock.type: "kafka"
 
 # http 模式下，发送的地址
-mock.url: "http://issac/applog"
+mock.url: "http://master/applog"
 
 # kafka模式下，发送的地址
 mock:
-  # kafka-server: "slaver1:9092,slaver2:9092,slaver3:9092"
-  kafka-server: "issac:9092"
+  kafka-server: "slaver1:9092,slaver2:9092,slaver3:9092"
   kafka-topic: "ods_base_log"
 
 # 启动次数
@@ -43,4 +42,3 @@ mock.if_get_coupon_rate: 75
 mock.max.coupon-id: 3
 # 搜索关键词  ssss
 mock.search.keyword: "图书,小米,iphone11,电视,口红,ps5,苹果手机,小米盒子"
-
