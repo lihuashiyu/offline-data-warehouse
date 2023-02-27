@@ -16,14 +16,14 @@ number=0                                                   # 初始值
 
 # 生成业务数据的日期
 if [ -n "$1" ]; then
-    MOCK_DATE="1"
+    MOCK_DATE="$1"
 else 
     MOCK_DATE=$(date +%F)
 fi
 
 
 # 循环启动
-while [ "${number}" -le "${MAX_COUNT}" ]
+while [ "${number}" -lt "${MAX_COUNT}" ]
 do
     number=$((number + 1))
     echo "    ****************************** ${number} : $(date '+%F %H:%M:%S') ****************************** "

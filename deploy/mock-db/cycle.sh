@@ -24,7 +24,7 @@ fi
 
 
 # 循环启动
-while [ "${number}" -le "${MAX_COUNT}" ]
+while [ "${number}" -lt "${MAX_COUNT}" ]
 do
     number=$((number + 1))
     echo "    ****************************** ${number} : $(date '+%F %H:%M:%S') ****************************** "

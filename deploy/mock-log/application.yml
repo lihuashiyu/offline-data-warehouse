@@ -18,7 +18,7 @@ mock.kafka-server: "slaver1:9092,slaver2:9092,slaver3:9092"
 mock.kafka-topic: "ods_base_log"
 
 # 启动次数
-mock.startup.count: 2000
+mock.startup.count: 200
 
 # 设备最大值
 mock.max.mid: 2000
