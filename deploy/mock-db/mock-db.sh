@@ -50,11 +50,14 @@ function service_start()
     if [ "${status}" == "${STOP_STATUS}" ]; then
         echo "    程序（${ALIAS_NAME}）正在加载中 ......"
         
-        # 数据 业务日期 修改
-        sed -i "s#mock.date =.*#mock.date = ${MOCK_DATE}#g" "${SERVICE_DIR}/${PROFILE}"
+        # 数据 业务日期 修改，数据正常生成
+        sed -i "s#mock.date =.*#mock.date = ${MOCK_DATE}#g"  "${SERVICE_DIR}/${PROFILE}"
+        sed -i "s#mock.clear =.*#mock.clear = 0#g"           "${SERVICE_DIR}/${PROFILE}"
+        sed -i "s#mock.clear.user =.*#mock.clear.user = 0#g" "${SERVICE_DIR}/${PROFILE}"
         
         # 3. 加载程序，启动程序
-        nohup java -jar "${SERVICE_DIR}/${SERVICE_NAME}" \
+        cd "${SERVICE_DIR}" || exit 
+		nohup java -jar "${SERVICE_DIR}/${SERVICE_NAME}" \
                    --spring.config.location="${SERVICE_DIR}/${PROFILE}" \
                    >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
         

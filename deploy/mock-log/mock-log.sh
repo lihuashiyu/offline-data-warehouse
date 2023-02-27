@@ -20,6 +20,13 @@ USER=$(whoami)                                             # 服务运行用户
 RUN_STATUS=1                                               # 服务运行状态
 STOP_STATUS=0                                              # 服务停止状态
 
+# 生成业务数据的日期
+if [ -n "$2" ]; then
+    MOCK_DATE="$2"
+else 
+    MOCK_DATE=$(date +%F)
+fi
+
 
 # 服务状态检测
 function service_status()
@@ -51,9 +58,10 @@ function service_start()
         sed -i "s#<property name=\"LOG_HOME\" value=.*#<property name=\"LOG_HOME\" value=\"${SERVICE_DIR}/logs\" />#g" "${SERVICE_DIR}/logback.xml"
         
         # 2.3 启动用户行为日志生成模块
+        cd "${SERVICE_DIR}" || exit 
         nohup java -jar "${SERVICE_DIR}/${SERVICE_NAME}" \
                    --spring.config.location="${SERVICE_DIR}/${PROFILE}" \
-                   > "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
+                   >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
         
         echo "    程序（${ALIAS_NAME}）启动验证中 ...... "
         sleep 5
@@ -138,7 +146,8 @@ case "$1" in
     
     # 5. 其它情况
     *)
-        echo "    脚本可传入一个参数，如下所示：          "
+        echo "    脚本可传入两个参数，使用方法：/path/$(basename $0) arg1 [arg2] "
+        echo "    arg1：服务选项，必填，如下表所示；arg2：日期（yyyy-mm-dd），可选，默认当天"
         echo "        +---------------------------------+ "
         echo "        | start | stop | restart | status | "
         echo "        +---------------------------------+ "

@@ -35,6 +35,10 @@ ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111  < "${PROJECT_DIR}/mock
 echo "****************************** 在 Hive 中创建数据仓库各层的表 ******************************"
 "${HIVE_HOME}/bin/hive" -f "${PROJECT_DIR}/sql/hive.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 
+# 4. 模拟生成用户行为日志历史日志
+MAX_COUNT=10                                               # 模拟数据生成循环次数
+
+
 # 4. 将用户行为日志导出到 kafka
 echo "***************************** 将 mock-log 中的日志导出到 kafka *****************************"
 "${PROJECT_DIR}/file-kafka/file-kafka.sh start"          >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1

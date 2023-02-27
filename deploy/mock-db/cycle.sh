@@ -16,8 +16,8 @@ MAX_COUNT=10                                               # 模拟数据生成�
 number=0                                                   # 初始值
 
 # 生成业务数据的日期
-if [ -n "${1}" ]; then
-    MOCK_DATE=${1}
+if [ -n "$1" ]; then
+    MOCK_DATE="$1"
 else 
     MOCK_DATE=$(date +%F)
 fi
@@ -27,7 +27,7 @@ fi
 while [ "${number}" -le "${MAX_COUNT}" ]
 do
     number=$((number + 1))
-    echo "    ****************************** ${number} : $(date +%F %H:%M:%S) ****************************** "
+    echo "    ****************************** ${number} : $(date '+%F %H:%M:%S') ****************************** "
     "${SERVICE_DIR}/mock-db.sh" start "${MOCK_DATE}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 
     sleep 15
 done
