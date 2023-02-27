@@ -43,12 +43,14 @@ function create_table()
     "${HIVE_HOME}/bin/hive" -f "${PROJECT_DIR}/sql/hive.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
     # 3. 在 Mysql 中创建所有从 Hive 中导出的表结构
+    echo "****************************** 在 Mysql 中创建 ADS 层的映射表 ******************************"
     ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 < "${PROJECT_DIR}/sql/export.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 }
 
 # 3. 模拟生成 5 天的 用户行为 历史日志
 function generate_log()
 {
+    echo "****************************** 模拟生成 5 天的用户行为日志 ******************************"
     number=5
         
     while [ "${number}" -gt 0 ]
@@ -58,7 +60,7 @@ function generate_log()
         
         for host_name in "${HOST_LIST[@]}"
         do
-            ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-log/cycle.sh ${nd_date}; mv ${PROJECT_DIR}/mock-log/logs/mock-$(date +%F).log ${PROJECT_DIR}/mock-log/logs/mock-${nd_date}.log "
+            ssh "${USER}@${host_name}" "source ~/.bashrc; source ~/.bash_profile; ${PROJECT_DIR}/mock-log/cycle.sh ${nd_date}; mv ${PROJECT_DIR}/mock-log/logs/mock-$(date +%F).log ${PROJECT_DIR}/mock-log/logs/mock-${nd_date}.log "
         done
     done
 }
@@ -66,18 +68,21 @@ function generate_log()
 # 4. 模拟生成 5 天的 业务数据 历史数据
 function generate_db()
 {
+    echo "****************************** 模拟生成 5 天的业务数据 ******************************"
     number=5
     while [ "${number}" -gt 0 ]
     do
         nd_date=$(date "+%Y-%m-%d" -d "-${number} days")
-        number=$((number - 1))
         
-        if [ "${nd_date}" == 5 ]; then
+        if [ "${number}" == "5" ]; then
             cd "${PROJECT_DIR}/mock-db/" || exit
+            echo "    初始化数据库    "
             java -jar mock-db.jar >> logs/init.log 2>&1 
-        else
-            "${PROJECT_DIR}/mock-db/cycle.sh" "${nd_date}"
+            sleep 30
         fi
+        
+        "${PROJECT_DIR}/mock-db/cycle.sh" "${nd_date}"
+        number=$((number - 1))
     done
 }
 
@@ -134,9 +139,9 @@ function warehouse()
 
 # create_model_log
 # generate_log
-kafka_hdfs
+# kafka_hdfs
 # mysql_kafka
-# generate_db
+generate_db
 # mysql_hdfs
 
 exit 0

@@ -20,8 +20,8 @@ RUN_STATUS=1                                               # 服务运行状态
 STOP_STATUS=0                                              # 服务停止状态
 
 # 生成业务数据的日期
-if [ -n "${2}" ]; then
-    MOCK_DATE=${2}
+if [ -n "$2" ]; then
+    MOCK_DATE="$2"
 else 
     MOCK_DATE=$(date +%F)
 fi
