@@ -33,18 +33,24 @@ function create_model_log()
 # 2. 创建所有 mysql 和 hive 表
 function create_table()
 {
-    # 1. 在 Mysql 中，将 mock-db 的数据导入到 数据库 at_gui_gu
+    # 1.创建数据库并授权
+    atguigu="    drop database if exists at_gui_gu;   create database if not exists at_gui_gu;   grant all privileges on at_gui_gu.* to 'issac'@'%';   flush privileges;"
+    view_report="drop database if exists view_report; create database if not exists view_report; grant all privileges on view_report.* to 'issac'@'%'; flush privileges;"
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "'${atguigu}'"    >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "'${view_report}'" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    
+    # 2. 在 Mysql 中，将 mock-db 的数据导入到 数据库 at_gui_gu
     echo "****************************** 将 mock-db 的 sql 执行到数据库 ******************************"
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 < "${PROJECT_DIR}/mock-db/table.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 < "${PROJECT_DIR}/mock-db/data.sql"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 -Dat_gui_gu < "${PROJECT_DIR}/mock-db/table.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 -Dat_gui_gu < "${PROJECT_DIR}/mock-db/data.sql"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 
-    # 2. 在 Hive 中创建所有的 ODS、DIM、DWD、DWS、ADS 表
+    # 3. 在 Hive 中创建所有的 ODS、DIM、DWD、DWS、ADS 表
     echo "****************************** 在 Hive 中创建数据仓库各层的表 ******************************"
     "${HIVE_HOME}/bin/hive" -f "${PROJECT_DIR}/sql/hive.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
-    # 3. 在 Mysql 中创建所有从 Hive 中导出的表结构
+    # 4. 在 Mysql 中创建所有从 Hive 中导出的表结构
     echo "****************************** 在 Mysql 中创建 ADS 层的映射表 ******************************"
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 < "${PROJECT_DIR}/sql/export.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 -Dview_report < "${PROJECT_DIR}/sql/export.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 }
 
 # 3. 模拟生成 5 天的 用户行为 历史日志
