@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_HOME" value="/home/issac/coding/java/github/offline-data-warehouse/deploy/mock-log/logs" />
+    <property name="LOG_HOME" value="/offline-data-warehouse/mock-log/logs" />
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%msg%n</pattern>
