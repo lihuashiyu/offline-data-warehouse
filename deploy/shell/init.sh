@@ -132,9 +132,9 @@ function warehouse()
 }
 
 
-create_model_log
-generate_log
-# kafka_hdfs
+# create_model_log
+# generate_log
+kafka_hdfs
 # mysql_kafka
 # generate_db
 # mysql_hdfs
