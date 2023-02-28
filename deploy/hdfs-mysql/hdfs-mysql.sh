@@ -13,6 +13,7 @@ DATAX_DIR=/opt/github/datax                                # Datax 安装路径
 HADOOP_DIR=/opt/apache/hadoop                              # Hadoop 路径
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 程序位置
 WAREHOUSE_DIR=/warehouse/ads                               # HDFS 的路径
+MYSQL_DATA_BASE=view_report                                # Mysql 数据库名
 LOG_FILE=hdfs_mysql.log                                    # 操作日志
 
 
@@ -20,20 +21,20 @@ LOG_FILE=hdfs_mysql.log                                    # 操作日志
 function export_data()
 {
     # 递归查询输入路径下的所有文件
-    hdfs_path=$("${HADOOP_DIR}/bin/hadoop" fs -ls -R "$2" | awk '{print $8}')
-    for path in ${hdfs_path}
+    data_dir_list=$("${HADOOP_DIR}/bin/hadoop" fs -ls -R "$2" | awk '{print $8}')
+    for path in ${data_dir_list}
     do
-        # 判断路径是否存在
+        # DataX导出路径不允许存在空文件，该函数作用为清理空文件
         "${HADOOP_DIR}/bin/hadoop" fs -test -z "${path}"
         if [[ $? -eq 0 ]]; then
-            echo "    路径（${path}）不存在，正在删除 ...... "
+            echo "    路径（${path}）中的文件大小为0，正在删除 ...... "
             "${HADOOP_DIR}/bin/hadoop" fs -rm -r -f "${path}"  >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
         fi
     done
     
     # 执行计划
-    echo "    DataX 正在同步 HDFS 路径（$2） 到 Mysql 数据库 ...... "
-    "${DATAX_DIR}/bin/datax.py" -p "-Dexportdir=$2" "$1"  >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
+    echo "    DataX 正在同步 HDFS（$2）的文件到 Mysql（${MYSQL_DATA_BASE}.$(echo $1 | awk -F '[/.]' '{print $4}')）数据库 ...... "
+    /usr/bin/python3 "${DATAX_DIR}/bin/datax.py" -p "-Dexportdir=$2" "$1"  >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
 }
 
 

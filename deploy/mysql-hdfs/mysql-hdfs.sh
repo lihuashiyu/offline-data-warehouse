@@ -15,6 +15,7 @@ DATAX_HOME=/opt/github/datax                               # Datax 安装路径
 HADOOP_HOME=/opt/apache/hadoop                             # Hadoop 路径
 WAREHOUSE_DIR=/warehouse/db                                # HDFS 上的路径
 LOG_FILE="mysql-hdfs-$(date +%F).log"                      # 操作日志
+MYSQL_DATA_BASE="at_gui_gu"                                #  Mysql 的数据库名称
 do_date=$(date -d "-1 day" +%F)                            # 当前日期的前一天
 
 # 如果传入日期则 do_date 等于传入的日期，否则等于前一天日期
@@ -42,8 +43,8 @@ import_data()
     fi
     
     # 3. 执行计划，进行数据同步
-    echo "    DataX 正在同步表数据到 HDFS 的 $2 路径 ...... "
-    "${DATAX_HOME}/bin/datax.py" -p "-Dtargetdir=$2" "$1"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    echo "    DataX 正在同步表（${MYSQL_DATA_BASE}.$(echo $1 | awk -F '[/.]' '{print $4}')）的数据到 HDFS 的 $2 路径 ...... "
+    /usr/bin/python3 "${DATAX_HOME}/bin/datax.py" -p "-Dtargetdir=$2" "$1"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 }
 
 
