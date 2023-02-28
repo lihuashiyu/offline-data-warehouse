@@ -41,8 +41,8 @@ function create_table()
     # 1.创建数据库并授权
     atguigu="    drop database if exists at_gui_gu;   create database if not exists at_gui_gu;   grant all privileges on at_gui_gu.* to 'issac'@'%';   flush privileges;"
     view_report="drop database if exists view_report; create database if not exists view_report; grant all privileges on view_report.* to 'issac'@'%'; flush privileges;"
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "'${atguigu}'"    >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "'${view_report}'" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "${atguigu}"    >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "${view_report}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
     # 2. 在 Mysql 中，将 mock-db 的数据导入到 数据库 at_gui_gu
     echo "****************************** 将 mock-db 的 sql 执行到数据库 ******************************"
@@ -71,6 +71,7 @@ function generate_log()
         
         for host_name in "${SLAVER_LIST[@]}"
         do
+            echo "    ************************** ${host_name} ： ${nd_date} **************************    "
             ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-log/cycle.sh ${nd_date}; mv ${PROJECT_DIR}/mock-log/logs/mock-$(date +%F).log ${PROJECT_DIR}/mock-log/logs/mock-${nd_date}.log "
         done
     done
@@ -158,11 +159,12 @@ function warehouse()
 }
 
 
-# create_model_log
-# generate_log
-# kafka_hdfs
-# mysql_kafka
+create_model_log
+create_table
+generate_log
+kafka_hdfs
+mysql_kafka
 generate_db
-# mysql_hdfs
+mysql_hdfs
 
 exit 0
