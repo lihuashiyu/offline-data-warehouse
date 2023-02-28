@@ -17,16 +17,21 @@ HIVE_HOME="/opt/apache/hive"                               # Hive 安装路径
 
 LOG_FILE="init-$(date +%F).log"                            # 操作日志
 USER=$(whoami)                                             # 当前用户
-HOST_LIST=(master)                 # 集群主机名称
+HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机名称
+MASTER_LIST=(master)                                       # master 主机名称
+SLAVER_LIST=(slaver1 slaver2 slaver3)                      # slaver 主机名称
 
 
 # 1. 创建各个模块的日志目录
 function create_model_log()
 {
-    module_list=$(ls "${PROJECT_DIR}")
+    module_list=$(ls -d "${PROJECT_DIR}"/*/)
     for module in ${module_list}
     do
-        mkdir -p "${PROJECT_DIR}/${module}/logs"
+        for host_name in "${HOST_LIST[@]}"
+        do
+            ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; mkdir -p ${module}/logs"
+        done
     done
 }
 
@@ -64,9 +69,9 @@ function generate_log()
         nd_date=$(date "+%Y-%m-%d" -d "-${number} days")
         number=$((number - 1))
         
-        for host_name in "${HOST_LIST[@]}"
+        for host_name in "${SLAVER_LIST[@]}"
         do
-            ssh "${USER}@${host_name}" "source ~/.bashrc; source ~/.bash_profile; ${PROJECT_DIR}/mock-log/cycle.sh ${nd_date}; mv ${PROJECT_DIR}/mock-log/logs/mock-$(date +%F).log ${PROJECT_DIR}/mock-log/logs/mock-${nd_date}.log "
+            ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-log/cycle.sh ${nd_date}; mv ${PROJECT_DIR}/mock-log/logs/mock-$(date +%F).log ${PROJECT_DIR}/mock-log/logs/mock-${nd_date}.log "
         done
     done
 }
@@ -80,14 +85,15 @@ function generate_db()
     do
         nd_date=$(date "+%Y-%m-%d" -d "-${number} days")
         
-        if [ "${number}" == "5" ]; then
-            cd "${PROJECT_DIR}/mock-db/" || exit
-            echo "    初始化数据库    "
-            java -jar mock-db.jar >> logs/init.log 2>&1 
-            sleep 30
-        fi
-        
-        "${PROJECT_DIR}/mock-db/cycle.sh" "${nd_date}"
+        for host_name in "${MASTER_LIST[@]}"
+        do
+            if [ "${number}" == "5" ]; then
+                echo "    在主机（${host_name}）初始化数据库    "
+                ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; cd ${PROJECT_DIR}/mock-db/ || exit; java -jar mock-db.jar >> logs/init.log 2>&1 "
+                sleep 30
+            fi
+            ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-db/cycle.sh ${nd_date}"
+        done
         number=$((number - 1))
     done
 }
@@ -96,22 +102,31 @@ function generate_db()
 function mysql_hdfs()
 {
     echo "***************************** 将 Mysql 的 维表数据 同步到 hdfs *****************************"
-    "${PROJECT_DIR}/mysql-hdfs/mysql-hdfs.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1    
+    for host_name in "${MASTER_LIST[@]}"
+    do
+        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-hdfs/mysql-hdfs.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    done
 }
 
 # 6. 将 Mysql 中的历史 实时数据 通过 maxwell 同步到 kafka
 function mysql_kafka()
 {
     echo "***************************** 将 Mysql 的 实时数据 同步到 kafka *****************************"
-    "${PROJECT_DIR}/mysql-hdfs/mysql-hdfs-init.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    for host_name in "${MASTER_LIST[@]}"
+    do
+        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-kafka/mysql-kafka-init.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    done
 }
 
 # 7. 将 kafka 中的 用户行为日志 和 业务实时数据 同步到 hdfs
 function kafka_hdfs()
 {
     echo "******************************* 将 kafka 的 数据 同步到 hdfs *******************************"
-    "${PROJECT_DIR}/mysql-hdfs/kafka-hdfs-log.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    "${PROJECT_DIR}/mysql-hdfs/kafka-hdfs-db.sh start"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    for host_name in "${MASTER_LIST[@]}"
+    do
+        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    done
 }
 
 # 8. 将 HDFS 的数据加载到 Hive 的 ODS

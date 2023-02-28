@@ -31,7 +31,7 @@ do
     # ssh "${USER}@${host_name}" "$@"
     
     # 3. 执行命令
-    ssh "${USER}@${host_name}" "source ~/.bashrc; source ~/.bash_profile; ${cmd}"
+    ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${cmd}"
 done
 
 printf "================================================================================\n\n"

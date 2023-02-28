@@ -12,7 +12,7 @@
 
 # 服务所在位置
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 脚本所在路径
-MYSQL_HOME="/opt/database/mysql"                           # Mysql 安装路径
+MYSQL_HOME="/opt/db/mysql"                                 # Mysql 安装路径
 HADOOP_HOME="/opt/apache/hadoop"                           # Hadoop 安装路径
 SPARK_HOME="/opt/apache/spark"                             # Spark 安装路径
 HIVE_HOME="/opt/apache/hive"                               # Hive 安装路径
@@ -21,7 +21,6 @@ KAFKA_HOME="/opt/apache/kafka"                             # Kafka 安装路径
 EFAK="/opt/apache/kafka/efak"                              # EFAK 安装路径
 
 HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机
-HOST_LIST=(master slaver)                 # 集群主机
 USER=$(whoami)                                             # 获取当前登录用户
 LOG_FILE="component-$(date +%F).log"                       # 操作日志
 
