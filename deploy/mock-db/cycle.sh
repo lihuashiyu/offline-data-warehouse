@@ -29,7 +29,7 @@ do
     number=$((number + 1))
     echo "    ****************************** ${number} : $(date '+%F %H:%M:%S') ****************************** "
     "${SERVICE_DIR}/mock-db.sh" start "${MOCK_DATE}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 
-    sleep 15
+    sleep 5
 done
 
 exit 0
