@@ -140,3 +140,4 @@ case "$1" in
     ;;
 esac
 printf "\n"
+exit 0
