@@ -13,7 +13,7 @@
 FLUME_NG=/opt/apache/flume                                 # flume 安装路径
 FLUME_PORT=44444                                           # flume 占用端口号
 SERVICE_DIR=$(cd $(dirname "$0") || exit; pwd)             # 需要执行的服务路径
-ALIAS_NAME="Kafka -> Flume -> HDFS"                        # 程序别名
+ALIAS_NAME="Kafka：db -> Flume -> HDFS"                        # 程序别名
 CONF_FILE=kafka-hdfs-log.conf                              # 配置文件
 
 KAFKA_URL="slaver1:9092,slaver2:9092,slaver3:9092"         # Kafka 连接 url
