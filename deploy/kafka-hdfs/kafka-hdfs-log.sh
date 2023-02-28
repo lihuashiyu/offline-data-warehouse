@@ -17,7 +17,7 @@ ALIAS_NAME="Kafka -> Flume -> HDFS"                        # 程序别名
 CONF_FILE=kafka-hdfs-log.conf                              # 配置文件
 
 KAFKA_URL="slaver1:9092,slaver2:9092,slaver3:9092"         # Kafka 连接 url
-KAFKA_TOPIC="mock"                                         # Kafka 主题
+KAFKA_TOPIC="mock-log"                                         # Kafka 主题
 HDFS_PATH="/warehouse/log/%Y-%m-%d"                        # 监控数据源路径
 INTERCEPTOR_JAR=flume-1.0.jar                              # Flume 拦截器 jar 包
 INTERCEPTOR_NAME=interceptor.TimeStampInterceptor\$Builder # Flume 拦截器 jar 包
