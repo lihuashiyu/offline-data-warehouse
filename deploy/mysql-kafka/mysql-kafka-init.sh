@@ -5,7 +5,7 @@
 #    CreateTime    ：  2023-02-24 01:44
 #    Author        ：  lihua shiyu
 #    Email         ：  lihuashiyu@github.com
-#    Description   ：  mysql-kafka-init.sh 被用于 ==> 该脚本的作用是初始化所有维度表，
+#    Description   ：  mysql-kafka-init.sh 被用于 ==> 该脚本的作用是初始化所有增量表，
 #                                                         只需执行一次
 # =========================================================================================
     

@@ -71,7 +71,7 @@ function service_start()
                                              -n a3 \
                                              -f "${SERVICE_DIR}/${CONF_FILE}" \
                                              -Dflume.root.logger=${INFO_OUT_TYPE} \
-                                             >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1 &
+                                             >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
         sleep 2
         echo "    程序（${ALIAS_NAME}）启动验证中 ...... "
         sleep 3

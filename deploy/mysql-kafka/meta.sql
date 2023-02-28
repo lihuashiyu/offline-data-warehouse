@@ -1,3 +1,8 @@
+drop database if exists maxwell;
+create database if not exists maxwell;
+use maxwell;
+
+
 drop table if exists `maxwell`.`bootstrap`;
 create table bootstrap
 (

@@ -113,6 +113,9 @@ function mysql_hdfs()
 function mysql_kafka()
 {
     echo "***************************** 将 Mysql 的 实时数据 同步到 kafka *****************************"
+    
+    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 < "${PROJECT_DIR}/mysql-kafka/meta.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    
     for host_name in "${MASTER_LIST[@]}"
     do
         ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-kafka/mysql-kafka-init.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
