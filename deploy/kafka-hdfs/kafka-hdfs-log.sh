@@ -23,8 +23,8 @@ INTERCEPTOR_JAR=flume-1.0.jar                              # Flume 拦截器 jar
 INTERCEPTOR_NAME=interceptor.TimeStampInterceptor\$Builder # Flume 拦截器 jar 包
 
 # LOG_FILE=$(date +%F-%H-%M-%S).log                        # 操作日志存储领
-LOG_FILE=kafka-hdfs-log.log                                    # 操作日志存储
-INFO_OUT_TYPE="INFO,console"                               # 
+LOG_FILE="kafka-hdfs-log-$(date +%F).log"                  # 操作日志存储
+INFO_OUT_TYPE="INFO,console"                               #  
 RUN_STATUS=1                                               # 运行状态
 STOP_STATUS=0                                              # 停止状态
 
@@ -32,7 +32,7 @@ STOP_STATUS=0                                              # 停止状态
 # 服务状态检测
 function service_status()
 {
-    pid_count=$(ps -aux | grep "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | wc -l)
+    pid_count=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | grep -v "$0" | wc -l)
     
     if [ "${pid_count}" -eq 0 ]; then
         echo "${STOP_STATUS}"
@@ -103,14 +103,17 @@ function service_stop()
     # 3. 杀死进程，关闭程序
     else
         echo "    程序（${ALIAS_NAME}）正在停止 ......"
-        temp=$(ps -aux | grep "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | awk '{print $2}' | xargs kill)
-        sleep 5
+        temp=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | grep -v "$0" | awk '{print $2}' | xargs kill -15)
+        
+        sleep 2
+        echo "    程序（${ALIAS_NAME}）停止验证中 ...... "
+        sleep 3
         
         # 4. 若还未关闭，则强制杀死进程，关闭程序
         stat=$(service_status)
         
         if [ "${pid_count}" == "${RUN_STATUS}" ]; then
-            tmp=$(ps -aux | grep "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | awk '{print $2}' | xargs kill -9)
+            tmp=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | grep -v "$0" | awk '{print $2}' | xargs kill -9)
         fi
         
         echo "    程序（${ALIAS_NAME}）已经停止成功 ......"
@@ -152,15 +155,15 @@ case "$1" in
     
     # 5. 其它情况
     *)
-        echo "    脚本可传入一个参数，如下所示：                     "
-        echo "        +--------------------------------------------+ "
-        echo "        |  start | stop | restart | status | reload  | "
-        echo "        +--------------------------------------------+ "
-        echo "        |          start      ：    启动服务         | "
-        echo "        |          stop       ：    关闭服务         | "
-        echo "        |          restart    ：    重启服务         | "
-        echo "        |          status     ：    查看状态         | "
-        echo "        +---------------------------------------------+ "
+        echo "    脚本可传入一个参数，如下所示：                    "
+        echo "        +-------------------------------------------+ "
+        echo "        |   start  |  stop  |  restart  |  status   | "
+        echo "        +-------------------------------------------+ "
+        echo "        |         start      ：    启动服务         | "
+        echo "        |         stop       ：    关闭服务         | "
+        echo "        |         restart    ：    重启服务         | "
+        echo "        |         status     ：    查看状态         | "
+        echo "        +-------------------------------------------+ "
     ;;
 esac
 printf "================================================================================\n\n"

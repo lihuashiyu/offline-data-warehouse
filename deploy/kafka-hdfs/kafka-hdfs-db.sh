@@ -17,13 +17,13 @@ ALIAS_NAME="Kafka -> Flume -> HDFS"                        # 程序别名
 CONF_FILE=kafka-hdfs-db.conf                               # 配置文件
 
 KAFKA_URL="slaver1:9092,slaver2:9092,slaver3:9092"         # Kafka 连接 url
-KAFKA_TOPIC="cart_info,comment_info,coupon_use,favor_info,order_detail_activity,order_detail_coupon,order_detail,order_info,order_refund_info,order_status_log,payment_info,refund_payment,user_info"                                         # Kafka 主题
+KAFKA_TOPIC="cart_info,comment_info,coupon_use,favor_info,order_detail_activity,order_detail_coupon,order_detail,order_info,order_refund_info,order_status_log,payment_info,refund_payment,user_info"  # Kafka 主题
 HDFS_PATH="/warehouse/db/%{topic}_inc/$(date +%F)"         # 监控数据源路径
 INTERCEPTOR_JAR=flume-1.0.jar                              # Flume 拦截器 jar 包
 INTERCEPTOR_NAME=interceptor.TimeInterceptor\$Builder      # Flume 拦截器 类名
 
 # LOG_FILE=$(date +%F-%H-%M-%S).log                        # 操作日志存储领
-LOG_FILE=kafka-hdfs-db.log                                 # 操作日志存储
+LOG_FILE="kafka-hdfs-db-$(date +%F).log"                   # 操作日志存储
 INFO_OUT_TYPE="INFO,console"                               # 
 RUN_STATUS=1                                               # 运行状态
 STOP_STATUS=0                                              # 停止状态
@@ -32,7 +32,7 @@ STOP_STATUS=0                                              # 停止状态
 # 服务状态检测
 function service_status()
 {
-    pid_count=$(ps -aux | grep "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | wc -l)
+    pid_count=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | grep -v "$0" | wc -l)
     
     if [ "${pid_count}" -eq 0 ]; then
         echo "${STOP_STATUS}"
@@ -99,14 +99,17 @@ function service_stop()
     # 3. 杀死进程，关闭程序
     else
         echo "    程序（${ALIAS_NAME}）正在停止 ......"
-        temp=$(ps -aux | grep "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | awk '{print $2}' | xargs kill)
-        sleep 5
+        temp=$(ps -aux | grep -i "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | grep -v "$0" | awk '{print $2}' | xargs kill -15)
+        
+        sleep 2
+        echo "    程序（${ALIAS_NAME}）停止验证中 ...... "
+        sleep 3
         
         # 4. 若还未关闭，则强制杀死进程，关闭程序
         stat=$(service_status)
         
         if [ "${pid_count}" == "${RUN_STATUS}" ]; then
-            tmp=$(ps -aux | grep "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | awk '{print $2}' | xargs kill -9)
+            tmp=$(ps -aux | grep "${USER}" | grep -i "${SERVICE_DIR}/${CONF_FILE}" | grep -v grep | grep -v "$0" | awk '{print $2}' | xargs kill -9)
         fi
         
         echo "    程序（${ALIAS_NAME}）已经停止成功 ......"
@@ -148,15 +151,15 @@ case "$1" in
     
     # 5. 其它情况
     *)
-        echo "    脚本可传入一个参数，如下所示：            "
-        echo "        +---------------------------------+ "
-        echo "        | start | stop | restart | status | "
-        echo "        +---------------------------------+ "
-        echo "        |      start    ：  启动服务      |  "
-        echo "        |      stop     ：  关闭服务      |  "
-        echo "        |      restart  ：  重启服务      |  "
-        echo "        |      status   ：  查看状态      |  "
-        echo "        +---------------------------------+ "
+        echo "    脚本可传入一个参数，如下所示：                    "
+        echo "        +-------------------------------------------+ "
+        echo "        |   start  |  stop  |  restart  |  status   | "
+        echo "        +-------------------------------------------+ "
+        echo "        |         start      ：    启动服务         | "
+        echo "        |         stop       ：    关闭服务         | "
+        echo "        |         restart    ：    重启服务         | "
+        echo "        |         status     ：    查看状态         | "
+        echo "        +-------------------------------------------+ "
     ;;
 esac
 printf "=========================================================================\n\n"

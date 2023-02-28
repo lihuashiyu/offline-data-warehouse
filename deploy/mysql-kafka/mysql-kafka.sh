@@ -21,7 +21,6 @@ LOG_FILE="mysql-kafka-$(date +%F).log"                     # 操作日志存储
 USER=$(whoami)                                             # 服务运行用户
 RUN_STATUS=1                                               # 服务运行状态
 STOP_STATUS=0                                              # 服务停止状态
-FULL=$2
 
 
 # 服务状态检测
@@ -48,23 +47,16 @@ function service_start()
     
     # 2. 判断程序的状态
     if [[ ${pc} -lt 1 ]]; then
-        # 2.1 判断是否为全量同步数据
-        if [ "${FULL}" == "all" ]; then
-            ${MAX_WELL_HOME}/bin/maxwell-bootstrap --database at_gui_gu \
-                                                   --table user_info \
-                                                   --config "${SERVICE_DIR}/${PROFILE}" \
-                                                   >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-        else
-            ${MAX_WELL_HOME}/bin/maxwell --config "${SERVICE_DIR}/${PROFILE}" \
-                                         --daemon >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1             
-        fi
+        # 2.1 启动 MaxWell
+        ${MAX_WELL_HOME}/bin/maxwell --config "${SERVICE_DIR}/${PROFILE}" \
+                                     --daemon >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
         
         echo "    程序（${ALIAS_NAME}）正在启动中 ......"
         sleep 2 
         echo "    程序（${ALIAS_NAME}）启动验证中 ......"
         sleep 3 
         
-        # 1.3 判断程序启动是否成功
+        # 2.2 判断程序启动是否成功
         count=$(service_status)
         if [ "${count}" -eq 1 ]; then
             echo "    程序（${ALIAS_NAME}）启动成功 ......"

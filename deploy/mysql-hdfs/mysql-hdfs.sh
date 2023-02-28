@@ -34,8 +34,8 @@ import_data()
         echo "    路径（$2）不存在，正在创建 ...... "
         ${HADOOP_HOME}/bin/hadoop fs -mkdir -p "$2"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     else
-        cs=$(${HADOOP_HOME}/bin/hadoop fs -count $2 | awk '{print $3}')
-        if [[ ${cs} -ne 0 ]]; then
+        cs=$("${HADOOP_HOME}/bin/hadoop" fs -count "$2" | awk '{print $3}')
+        if [[ "${cs}" -ne 0 ]]; then
             echo "    路径（$2）不为空，正在清空......"
             ${HADOOP_HOME}/bin/hadoop fs -rm -r -f "$2/*"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
         fi
