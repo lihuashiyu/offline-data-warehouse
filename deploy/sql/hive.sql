@@ -1,7 +1,7 @@
 -- -------------------------------------------------------------------------------------------------
 -- 创建数据库
 -- -------------------------------------------------------------------------------------------------
-drop database if exists warehouse;
+-- drop database if exists warehouse;
 create database if not exists warehouse;
 use warehouse;
 

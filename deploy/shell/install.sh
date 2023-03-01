@@ -12,14 +12,12 @@
 PROJECT_DIR=$(cd "$(dirname "$0")/../" || exit; pwd)           # 项目根路径
 HOST_LIST=(master slaver1 slaver2 slaver3)
 USER=$(whoami)
+TARGET_PATH=$(cd -P "${PROJECT_DIR}" || exit; pwd)/
 
-# 1. 遍历循环读取主机 ${HOST_LIST[@]}
+
 for host_name in "${HOST_LIST[@]}"
 do
-    echo "============================== 向主机（${host_name}）同步数据 =============================="    
-    # 2. 创建目录
-    ssh "${USER}@${host_name}" "mkdir -p ${PROJECT_DIR}; exit "
-    
+    echo "============================== 向主机（${host_name}）同步数据 =============================="
     # 3. 执行同步
-    rsync -zav --delete  "${PROJECT_DIR}"  "${USER}@${host_name}:${PROJECT_DIR}"
+    rsync -zav --delete  "${TARGET_PATH}"  "${USER}@${host_name}:${TARGET_PATH}"
 done
