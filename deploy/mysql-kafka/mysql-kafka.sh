@@ -109,14 +109,14 @@ case $1 in
     status)
         # 3.1 统计正在运行程序的 pid 的个数
         pc=$(service_status)
-
+        
         #  3.2 判断运行状态
         if [ "${pc}" == "${RUN_STATUS}" ]; then
-            echo "    程序（${ALIAS_NAME}）正在运行中 ......"
-        elif [ "${pc}" == "${RUN_STATUS}" ]; then
-            echo "    程序（${ALIAS_NAME}）已经停止 ......"
+            echo "    程序（${ALIAS_NAME}）正在运行中 ...... "
+        elif [ "${pc}" == "${STOP_STATUS}" ]; then
+            echo "    程序（${ALIAS_NAME}）已经停止 ...... "
         else
-            echo "${pc}"
+            echo "    程序（${ALIAS_NAME}）运行出错 ...... "
         fi
     ;;
 

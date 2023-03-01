@@ -162,6 +162,10 @@ function warehouse()
 }
 
 
+# 启动大数据组件
+"${SERVICE_DIR}/component.sh" start 
+
+# 执行程序
 create_model_log
 create_table
 generate_log
