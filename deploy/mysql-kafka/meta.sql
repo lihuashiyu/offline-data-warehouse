@@ -3,8 +3,8 @@ create database if not exists maxwell;
 use maxwell;
 
 
-drop table if exists `maxwell`.`bootstrap`;
-create table bootstrap
+drop table if exists `bootstrap`;
+create table if not exists bootstrap
 (
     id              bigint auto_increment primary key,
     database_name   varchar(255) charset utf8                     not null,
@@ -24,8 +24,8 @@ create table bootstrap
 
 
 
-drop table if exists `maxwell`.`columns`;
-create table columns
+drop table if exists `columns`;
+create table if not exists columns
 (
     id            bigint auto_increment primary key,
     schema_id     bigint                    null,
@@ -39,11 +39,11 @@ create table columns
 );
 
 create index schema_id on columns (schema_id);
-create index table_id on columns (table_id);
+create index table_id  on columns (table_id);
 
 
-drop table if exists `maxwell`.`databases`;
-create table `databases`
+drop table if exists `databases`;
+create table if not exists `databases`
 (
     id        bigint auto_increment primary key,
     schema_id bigint                    null,
@@ -54,8 +54,8 @@ create table `databases`
 create index schema_id on `databases` (schema_id);
 
 
-drop table if exists `maxwell`.`heartbeats`;
-create table heartbeats
+drop table if exists `heartbeats`;
+create table if not exists heartbeats
 (
     server_id int unsigned                                  not null,
     client_id varchar(255) charset latin1 default 'maxwell' not null,
@@ -64,8 +64,8 @@ create table heartbeats
 );
 
 
-drop table if exists `maxwell`.`positions`;
-create table positions
+drop table if exists `positions`;
+create table if not exists positions
 (
     server_id           int unsigned                                  not null,
     binlog_file         varchar(255)                                  null,
@@ -77,8 +77,8 @@ create table positions
     primary key (server_id, client_id)
 );
 
-drop table if exists `maxwell`.`schemas`;
-create table `schemas`
+drop table if exists `schemas`;
+create table if not exists `schemas`
 (
     id                  bigint auto_increment primary key,
     binlog_file         varchar(255)                  null,
@@ -96,8 +96,8 @@ create table `schemas`
 );
 
 
-drop table if exists `maxwell`.`tables`;
-create table tables
+drop table if exists `tables`;
+create table if not exists tables
 (
     id          bigint auto_increment primary key,
     schema_id   bigint                     null,
@@ -108,4 +108,4 @@ create table tables
 );
 
 create index database_id on tables (database_id);
-create index schema_id on tables (schema_id);
+create index schema_id   on tables (schema_id);

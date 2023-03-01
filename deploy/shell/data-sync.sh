@@ -21,28 +21,28 @@ function service_status()
     for host_name in "${SLAVER_LIST[@]}"
     do
         # 1. 模拟用户行为日志
-        p1=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/mock-log/mock-log.sh status     | grep -Ev '^$|====' ")
+        p1=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-log/mock-log.sh status"     | grep -Ev '^$|====')
         echo "    主机（${host_name}） ：${p1}"
         
         # 2. 模拟业务数据生成
-        p2=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/mock-db/mock-db.sh status       | grep -Ev '^$|====' ")
+        p2=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-db/mock-db.sh status"       | grep -Ev '^$|====')
         echo "    主机（${host_name}） ：${p2}"
         
         # 3. flume 日志监控
-        p3=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/file-kafka/file-kafka.sh status | grep -Ev '^$|====' ")
+        p3=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/file-kafka/file-kafka.sh status" | grep -Ev '^$|====')
         echo "    主机（${host_name}） ：${p3}"
     done
     
     # 4. maxwell 数据库监控
-    p4=$(ssh "${USER}@slaver1" "${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh status   | grep -Ev '^$|====' ")
+    p4=$(ssh "${USER}@slaver1" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh status"   | grep -Ev '^$|====')
     echo "    主机（slaver1） ：${p4}"
     
     # 5. flume 将 kafka 的用户行为日志同步到 hdfs
-    p5=$(ssh "${USER}@slaver2" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh status | grep -Ev '^$|====' ")
-    echo "    主机（slaver2}） ：${p5}"
+    p5=$(ssh "${USER}@slaver2" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh status" | grep -Ev '^$|====')
+    echo "    主机（slaver2） ：${p5}"
     
     # 6. flume 将 kafka 的业务数据同步到 hdfs
-    p6=$(ssh "${USER}@slaver3" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh status  | grep -Ev '^$|====' ") 
+    p6=$(ssh "${USER}@slaver3" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh status"  | grep -Ev '^$|====') 
     echo "    主机（slaver3） ：${p6}"
 }
     
@@ -50,30 +50,30 @@ function service_status()
 function service_start()
 {  
     # 1. flume 将 kafka 的业务数据同步到 hdfs
-    p1=$(ssh "${USER}@slaver3" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh start  | grep -Ev '^$|====' ") 
+    p1=$(ssh "${USER}@slaver3" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh start"  | grep -Ev '^$|====') 
     echo "    主机（slaver3） ：${p1}"
     
     # 2. flume 将 kafka 的用户行为日志同步到 hdfs
-    p2=$(ssh "${USER}@slaver2" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh start | grep -Ev '^$|====' ")
+    p2=$(ssh "${USER}@slaver2" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh start" | grep -Ev '^$|====')
     echo "    主机（slaver2） ：${p2}"
     
     # 3. maxwell 数据库监控
-    p3=$(ssh "${USER}@slaver1" "${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh start   | grep -Ev '^$|====' ")
+    p3=$(ssh "${USER}@slaver1" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh start"   | grep -Ev '^$|====')
     echo "    主机（slaver1） ：${p3}"
     
     for host_name in "${SLAVER_LIST[@]}"
     do
         # 4. flume 日志监控
-        p4=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/file-kafka/file-kafka.sh start | grep -Ev '^$|====' ")
+        p4=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/file-kafka/file-kafka.sh start" | grep -Ev '^$|====')
         echo "    主机（${host_name}） ：${p4}"
         
         # 5. 模拟用户行为日志
-        p5=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/mock-log/cycle.sh start        | grep -Ev '^$|====' ")
-        echo "    主机（${host_name}） ：${p5}"
+        p5=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-log/cycle.sh" | grep -Ev '^$|====')
+        echo "    主机（${host_name}） ==> log ：${p5}"
         
         # 6. 模拟业务数据生成
-        p6=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/mock-log/cycle.sh start        | grep -Ev '^$|====' ")
-        echo "    主机（${host_name}） ：${p6}"
+        p6=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-db/cycle.sh"  | grep -Ev '^$|====')
+        echo "    主机（${host_name}） ==> db ：${p6}"
     done
 }
     
@@ -83,28 +83,28 @@ function service_stop()
     for host_name in "${SLAVER_LIST[@]}"
     do
         # 1. 模拟用户行为日志
-        p1=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/mock-log/mock-log.sh stop     | grep -Ev '^$|====' ")
+        p1=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-log/mock-log.sh stop"     | grep -Ev '^$|====')
         echo "    主机（${host_name}） ：${p1}"
         
         # 2. 模拟业务数据生成
-        p2=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/mock-db/mock-db.sh stop       | grep -Ev '^$|====' ")
+        p2=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-db/mock-db.sh stop"       | grep -Ev '^$|====')
         echo "    主机（${host_name}） ：${p2}"
         
         # 3. flume 日志监控
-        p3=$(ssh "${USER}@${host_name}" "${PROJECT_DIR}/file-kafka/file-kafka.sh stop | grep -Ev '^$|====' ")
+        p3=$(ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/file-kafka/file-kafka.sh stop" | grep -Ev '^$|====')
         echo "    主机（${host_name}） ：${p3}"
     done
             
     # 4. maxwell 数据库监控
-    p4=$(ssh "${USER}@slaver1" "${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh stop   | grep -Ev '^$|====' ")
+    p4=$(ssh "${USER}@slaver1" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh stop"   | grep -Ev '^$|====')
     echo "    主机（slaver1） ：${p4}"
     
     # 5. flume 将 kafka 的用户行为日志同步到 hdfs
-    p5=$(ssh "${USER}@slaver2" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh stop | grep -Ev '^$|====' ")
+    p5=$(ssh "${USER}@slaver2" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh stop" | grep -Ev '^$|====')
     echo "    主机（slaver2） ：${p5}"
     
     # 6. flume 将 kafka 的业务数据同步到 hdfs
-    p6=$(ssh "${USER}@slaver3" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh stop  | grep -Ev '^$|====' ")
+    p6=$(ssh "${USER}@slaver3" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh stop"  | grep -Ev '^$|====')
     echo "    主机（slaver3） ：${p6}" 
 }
     
