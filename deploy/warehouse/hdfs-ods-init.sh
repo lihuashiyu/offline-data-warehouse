@@ -4,9 +4,9 @@
 # 定义变量方便修改
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
 HIVE_DATA_BASE=warehouse                                   # Hive 的数据库名称
-HDFS_DB_PATH=/warehouse/origin/db                          # 需要同步的数据库数据，在 HDFS 的路径
-# LOG_FILE=hdfs_ods_db.log                                   # 执行日志
-LOG_FILE="hdfs_ods_db-$(date +%F).log"            # 执行日志
+HDFS_DB_PATH=/warehouse/db                                 # 需要同步的数据库数据，在 HDFS 的路径
+# LOG_FILE=hdfs_ods_db.log                                 # 执行日志
+LOG_FILE="hdfs_ods_db-$(date +%F).log"                     # 执行日志
 
 
 # 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天

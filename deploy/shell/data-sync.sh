@@ -35,15 +35,15 @@ function service_status()
     
     # 4. maxwell 数据库监控
     p4=$(ssh "${USER}@slaver1" "${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh status   | grep -Ev '^$|====' ")
-    echo "    主机（${host_name}） ：${p4}"
+    echo "    主机（slaver1） ：${p4}"
     
     # 5. flume 将 kafka 的用户行为日志同步到 hdfs
     p5=$(ssh "${USER}@slaver2" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh status | grep -Ev '^$|====' ")
-    echo "    主机（${host_name}） ：${p5}"
+    echo "    主机（slaver2}） ：${p5}"
     
     # 6. flume 将 kafka 的业务数据同步到 hdfs
     p6=$(ssh "${USER}@slaver3" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh status  | grep -Ev '^$|====' ") 
-    echo "    主机（${host_name}） ：${p6}"
+    echo "    主机（slaver3） ：${p6}"
 }
     
 # 2. 服务启动
@@ -51,15 +51,15 @@ function service_start()
 {  
     # 1. flume 将 kafka 的业务数据同步到 hdfs
     p1=$(ssh "${USER}@slaver3" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh start  | grep -Ev '^$|====' ") 
-    echo "    主机（${host_name}） ：${p1}"
+    echo "    主机（slaver3） ：${p1}"
     
     # 2. flume 将 kafka 的用户行为日志同步到 hdfs
     p2=$(ssh "${USER}@slaver2" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh start | grep -Ev '^$|====' ")
-    echo "    主机（${host_name}） ：${p2}"
+    echo "    主机（slaver2） ：${p2}"
     
     # 3. maxwell 数据库监控
     p3=$(ssh "${USER}@slaver1" "${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh start   | grep -Ev '^$|====' ")
-    echo "    主机（${host_name}） ：${p3}"
+    echo "    主机（slaver1） ：${p3}"
     
     for host_name in "${SLAVER_LIST[@]}"
     do
@@ -97,15 +97,15 @@ function service_stop()
             
     # 4. maxwell 数据库监控
     p4=$(ssh "${USER}@slaver1" "${PROJECT_DIR}/mysql-kafka/mysql-kafka.sh stop   | grep -Ev '^$|====' ")
-    echo "    主机（${host_name}） ：${p4}"
+    echo "    主机（slaver1） ：${p4}"
     
     # 5. flume 将 kafka 的用户行为日志同步到 hdfs
     p5=$(ssh "${USER}@slaver2" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh stop | grep -Ev '^$|====' ")
-    echo "    主机（${host_name}） ：${p5}"
+    echo "    主机（slaver2） ：${p5}"
     
     # 6. flume 将 kafka 的业务数据同步到 hdfs
     p6=$(ssh "${USER}@slaver3" "${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh stop  | grep -Ev '^$|====' ")
-    echo "    主机（${host_name}） ：${p6}" 
+    echo "    主机（slaver3） ：${p6}" 
 }
     
     
