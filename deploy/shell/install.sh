@@ -15,9 +15,18 @@ USER=$(whoami)
 TARGET_PATH=$(cd -P "${PROJECT_DIR}" || exit; pwd)/
 
 
-for host_name in "${HOST_LIST[@]}"
+cd "${PROJECT_DIR}/" || exit
+module_list=$(ls -d *)
+
+for module in ${module_list}
 do
-    echo "============================== 向主机（${host_name}）同步数据 =============================="
-    # 3. 执行同步
-    rsync -zav --delete  "${TARGET_PATH}"  "${USER}@${host_name}:${TARGET_PATH}"
+    echo "mkdir -p ${PROJECT_DIR}/${module}/logs"
 done
+# 
+# 
+# for host_name in "${HOST_LIST[@]}"
+# do
+#     echo "============================== 向主机（${host_name}）同步数据 =============================="
+#     # 3. 执行同步
+#     rsync -zav --delete  "${TARGET_PATH}"  "${USER}@${host_name}:${TARGET_PATH}"
+# done

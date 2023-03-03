@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 
-# 定义变量方便修改
+SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
 HIVE_DATA_BASE=warehouse                                   # Hive 的数据库名称
-MOCK=mock                                                  # 日志名称
-WARE_HOUSE_DIR=/warehouse/origin                           # 日志在 HDFS 上的路径
+WARE_HOUSE_DIR=/warehouse                                  # 原始文件在在 HDFS 上的路径
+LOG_FILE="hdfs-ods-$(date +%F).log"                        # 执行日志
 
 
 # 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天
@@ -15,7 +15,7 @@ else
 fi
 
 echo "======================================== 日志日期为 ${do_date} ========================================"
-sql="load data inpath '${WARE_HOUSE_DIR}/${MOCK}/${do_date}' into table ${HIVE_DATA_BASE}.ods_log_inc partition(dt='${do_date}');"
+sql="load data inpath '${WARE_HOUSE_DIR}/log/${do_date}' into table ${HIVE_DATA_BASE}.ods_log_inc partition(dt='${do_date}');"
 hive -e "${sql}"
 
 
@@ -25,11 +25,11 @@ function load_data()
     for table in $*
     do
         # 判断路径是否存在
-        hadoop fs -test -e "${HDFS_DB_PATH}/${table:4}/${do_date}"
+        hadoop fs -test -e "${WARE_HOUSE_DIR}/db/${table:4}/${do_date}"
         
         # 路径存在方可装载数据
         if [[ $? = 0 ]]; then
-            sql=$sql"load data inpath '${HDFS_DB_PATH}/${table:4}/${do_date}' overwrite into table ${HIVE_DATA_BASE}.${table} partition(dt='${do_date}');"
+            sql=$sql"load data inpath '${WARE_HOUSE_DIR}/db/${table:4}/${do_date}' overwrite into table ${HIVE_DATA_BASE}.${table} partition(dt='${do_date}');"
         fi
     done
     
