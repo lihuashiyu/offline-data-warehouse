@@ -44,7 +44,7 @@ function service_status()
 function service_start()
 {
     # 1. 复制拦截器的 jar 到 flume 安装路径的 lib 目录下，并替换 拦截器名称
-    cp -fpr "${SERVICE_DIR}/${INTERCEPTOR_JAR}" ${FLUME_HOME}/lib >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
+    cp -fpr "${SERVICE_DIR}/${INTERCEPTOR_JAR}" ${FLUME_HOME}/lib >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     sed -i "s#a1.sources.r1.interceptors.i1.type.*#a1.sources.r1.interceptors.i1.type = ${INTERCEPTOR_NAME}#g" "${SERVICE_DIR}/${CONF_FILE}"
     
     # 2. 替换数据源和缓存
