@@ -146,7 +146,7 @@ case "$1" in
     # 5. 其它情况
     *)
         echo "    脚本可传入两个参数，使用方法：/path/$(basename $0) arg1 [arg2] "
-        echo "    arg1：服务选项，必填，如下表所示；arg2：日期（yyyy-mm-dd），可选，默认当天"
+        echo "    arg1：服务选项，必填，如下表所示；arg2：日期（yyyy-mm-dd），可选，默认当天 "
         echo "        +---------------------------------+ "
         echo "        | start | stop | restart | status | "
         echo "        +---------------------------------+ "
