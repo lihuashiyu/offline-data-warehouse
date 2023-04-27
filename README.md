@@ -276,17 +276,14 @@
     cd ~ || exit                                                               # 进入用户家目录
     tar -zxvf ~/offline-data-warehouse-1.0.tar.gz                              # 解压部署包
     
-    # 3. 进行集群部署
+    # 3. 进行集群部署以及初始化
     cd ~/offline-data-warehouse  || exit                                       # 进入部署路径
-    ~/offline-data-warehouse/shell/install.sh                                  # 执行安装脚本，进行多台服务器部署安装
-    
-    # 4. 部署后初始化
     ~/offline-data-warehouse/shell/init.sh                                     # 执行初始化脚本，进行多台服务器部署完后初始化
-    ~/offline-data-warehouse/shell/xync.sh ~/offline-data-warehouse            # 同步部署文件到其它节点
     
-    # 5. 一键启动，将模拟生成的 业务数据、用户行为日志，同步到 HDFS 的 /warehouse/tmp/ （注意：此脚本只适用于增量同步）
+    # 4. 一键启动，将模拟生成的 业务数据、用户行为日志，同步到 HDFS 的 /warehouse/tmp/ （注意：此脚本只适用于增量同步）
     ~/offline-data-warehouse/shell/warer-house.sh start                        # 执行部署脚本，进行多台服务器部署
     
-    # 6. 查看数据是否同步成功
-    ${HADOOP_HOME}/bin/hadoop fs -ls -l /hiwarehouseve/tmp/ 
+    # 5. 查看数据是否同步成功
+    ${HADOOP_HOME}/bin/hadoop fs -ls -l /warehouse/tmp/
+     
 ```
