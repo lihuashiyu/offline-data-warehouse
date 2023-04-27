@@ -26,6 +26,7 @@ echo "============================ flume 源码构建 ==========================
 # 4. 复制生成的 jar 到 deploy/file-kafka
 echo "============================== 复制 jar =============================="
 cp -fp "${SERVICE_DIR}"/target/*with*.jar "${ROOT_DIR}"/deploy/file-kafka/flume-1.0.jar
+cp -fp "${SERVICE_DIR}"/target/*with*.jar "${ROOT_DIR}"/deploy/kafka-hdfs/flume-1.0.jar
 
 # 5. 清理退出 
 echo "============================== 清理退出 =============================="
