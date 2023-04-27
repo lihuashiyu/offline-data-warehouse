@@ -290,3 +290,22 @@
 ```
 
 <br/>
+
+## 6. HDFS 路径说明
+
+```bash
+    /warehouse
+      ├── ads                                              # ADS 层表数据存储路径
+      ├── conf                                             # 配置文件   存储路径
+      ├── data                                             # 第三方文件 存储路径
+      ├── db                                               # 同步的 业务数据 路径
+      ├── dim                                              # DIM 层表数据存储路径
+      ├── dwd                                              # DWD 层表数据存储路径
+      ├── dws                                              # DWS 层表数据存储路径
+      ├── jars                                             # 自定义 udf、udaf、udtf 函数 jar
+      ├── log                                              # 同步的 行为日志 路径
+      ├── ods                                              # ODS 层表数据存储路径
+      └── tmp                                              # TMP 临时数据存储路径
+```
+
+<br/>
