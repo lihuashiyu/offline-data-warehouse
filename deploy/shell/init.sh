@@ -162,7 +162,10 @@ function warehouse()
 }
 
 
-# 启动大数据组件
+# 1. 将解压后的项目同步到其它节点
+"${SERVICE_DIR}"/xync.sh "${PROJECT_DIR}/"
+
+# 2. 启动大数据组件
 "${SERVICE_DIR}/component.sh" start 
 
 # 执行程序
