@@ -128,6 +128,7 @@
      ├── data                                              # flume 同步过程中产生的数据存储目录
      │     ├── db                                          # 增量业务数据  
      │     └── log                                         # 用户行为日志
+     ├── flume-1.0.jar                                     # 执行 offline-data-warehouse/flume/build.sh 生成的 jar，用于拦截不规则数据
      ├── kafka-hdfs-db.conf                                # 增量业务数据 同步到 hdfs 的配置文件
      ├── kafka-hdfs-db.sh                                  # 增量业务数据 同步启停脚本
      ├── kafka-hdfs-log.conf                               # 用户行为日志 同步到 hdfs 的配置文件
@@ -287,3 +288,5 @@
     ${HADOOP_HOME}/bin/hadoop fs -ls -l /warehouse/tmp/
      
 ```
+
+<br/>
