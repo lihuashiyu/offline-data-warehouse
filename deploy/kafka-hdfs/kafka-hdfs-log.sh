@@ -17,7 +17,8 @@ ALIAS_NAME="Kafka：log -> Flume -> HDFS"                        # 程序别名
 CONF_FILE=kafka-hdfs-log.conf                              # 配置文件
 
 KAFKA_URL="slaver1:9092,slaver2:9092,slaver3:9092"         # Kafka 连接 url
-KAFKA_TOPIC="mock-log"                                     # Kafka 主题
+KAFKA_LOG_TOPIC="mock-log"                                 # Kafka source 主题
+KAFKA_FLUME_TOPIC="mock-log"                               # Kafka channel 主题
 HDFS_PATH="/warehouse/log/%Y-%m-%d"                        # 监控数据源路径
 INTERCEPTOR_JAR=flume-1.0.jar                              # Flume 拦截器 jar 包
 INTERCEPTOR_NAME=interceptor.TimeStampInterceptor\$Builder # Flume 拦截器 jar 包
@@ -50,11 +51,11 @@ function service_start()
     
     # 2. 替换 Kafka 连接的 url 和 topic
     sed -i "s#a2.sources.r2.kafka.bootstrap.servers.*#a2.sources.r2.kafka.bootstrap.servers = ${KAFKA_URL}#g" "${SERVICE_DIR}/${CONF_FILE}"
-    sed -i "s#a2.sources.r2.kafka.topics.*#a2.sources.r2.kafka.topics = ${KAFKA_TOPIC}#g" "${SERVICE_DIR}/${CONF_FILE}"
+    sed -i "s#a2.sources.r2.kafka.topics.*#a2.sources.r2.kafka.topics = ${KAFKA_LOG_TOPIC}#g" "${SERVICE_DIR}/${CONF_FILE}"
     
     # 3. 替换缓存数据 Kafka 连接的 url 和 topic
-    sed -i "s#a2.channels.c2.kafka.bootstrap.servers.*#a2.channels.c2.kafka.bootstrap.servers = ${KAFKA_URL}#g" "${SERVICE_DIR}/${CONF_FILE}"
-    sed -i "s#a2.channels.c2.kafka.topic.*#a2.channels.c2.kafka.topic = ${KAFKA_TOPIC}#g" "${SERVICE_DIR}/${CONF_FILE}"
+    # sed -i "s#a2.channels.c2.kafka.bootstrap.servers.*#a2.channels.c2.kafka.bootstrap.servers = ${KAFKA_URL}#g" "${SERVICE_DIR}/${CONF_FILE}"
+    # sed -i "s#a2.channels.c2.kafka.topic.*#a2.channels.c2.kafka.topic = ${KAFKA_FLUME_TOPIC}#g" "${SERVICE_DIR}/${CONF_FILE}"
     
     # 4. 替换缓存数据检查点
     sed -i "s#a2.channels.c2.datadirs.*#a2.channels.c2.datadirs = ${SERVICE_DIR}/data/log/#g" "${SERVICE_DIR}/${CONF_FILE}"
