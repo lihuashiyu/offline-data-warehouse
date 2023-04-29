@@ -61,7 +61,7 @@ function service_start()
         cd "${SERVICE_DIR}" || exit 
         nohup java -jar "${SERVICE_DIR}/${SERVICE_NAME}" \
                    --spring.config.location="${SERVICE_DIR}/${PROFILE}" \
-                   >> /dev/null 2>&1 &
+                   >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
         
         sleep 2
         echo "    程序（${ALIAS_NAME}）启动验证中 ...... "
