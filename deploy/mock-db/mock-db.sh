@@ -15,6 +15,7 @@ ALIAS_NAME=mock-db                                         # 程序别名
 PROFILE=application.properties                             # 配置文件
 LOG_FILE="mock-db-$(date +%F).log"                         # 程序运行日志文件
 
+MOCK_DATE=2021-08-05
 USER=$(whoami)                                             # 服务运行用户
 RUN_STATUS=1                                               # 服务运行状态
 STOP_STATUS=0                                              # 服务停止状态
