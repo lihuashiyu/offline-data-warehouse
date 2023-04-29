@@ -31,7 +31,7 @@ create table if not exists activity_rule
     benefit_amount   decimal(16, 2)                     comment '优惠金额',
     benefit_discount decimal(10, 2)                     comment '优惠折扣',
     benefit_level    bigint(20)                         comment '优惠级别'
-) engine = InnoDB auto_increment = 3 comment = '优惠规则';
+) engine = InnoDB auto_increment = 1 comment = '优惠规则';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for activity_sku
@@ -43,7 +43,7 @@ create table if not exists activity_sku
     activity_id bigint(20)                            comment '活动 id ',
     sku_id      bigint(20)                            comment 'sku_id',
     create_time datetime(0)                           comment '创建时间'
-) engine = InnoDB auto_increment = 4  comment = '活动参与商品';
+) engine = InnoDB auto_increment = 1  comment = '活动参与商品';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for base_attr_info
@@ -55,7 +55,7 @@ create table if not exists base_attr_info
     attr_name      varchar(100) not null                   comment '属性名称',
     category_id    bigint(20)                              comment '分类id',
     category_level int(11)                                 comment '分类层级'
-) engine = InnoDB auto_increment = 115  comment = '属性表';
+) engine = InnoDB auto_increment = 1  comment = '属性表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for base_attr_value
@@ -66,7 +66,7 @@ create table if not exists base_attr_value
     id         bigint(20)   primary key auto_increment comment '编号',
     value_name varchar(100) not null                   comment '属性值名称',
     attr_id    bigint(20)                              comment '属性id'
-) engine = InnoDB auto_increment = 219  comment = '属性值表'
+) engine = InnoDB auto_increment = 1  comment = '属性值表'
  ;
 
 -- -------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ create table if not exists base_category1
 (
     id   bigint(20)  primary key auto_increment comment '编号',
     name varchar(10) not null                   comment '分类名称'
-) engine = InnoDB auto_increment = 18  comment = '一级分类表';
+) engine = InnoDB auto_increment = 1  comment = '一级分类表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for base_category2
@@ -88,7 +88,7 @@ create table if not exists base_category2
     id           bigint(20)   primary key auto_increment comment '编号',
     name         varchar(200) not null                   comment '二级分类名称',
     category1_id bigint(20)                              comment '一级分类编号'
-) engine = InnoDB auto_increment = 114  comment = '二级分类表';
+) engine = InnoDB auto_increment = 1  comment = '二级分类表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for base_category3
@@ -99,7 +99,7 @@ create table if not exists base_category3
     id           bigint(20)   primary key auto_increment comment '编号',
     name         varchar(200) not null                   comment '三级分类名称',
     category2_id bigint(20)                              comment '二级分类编号'
-) engine = InnoDB auto_increment = 1100 comment = '三级分类表';
+) engine = InnoDB auto_increment = 1 comment = '三级分类表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for base_dic
@@ -157,9 +157,8 @@ drop table if exists base_sale_attr;
 create table if not exists base_sale_attr
 (
     id   bigint(20)  primary key auto_increment comment '编号',
-    name varchar(20) not null comment '销售属性名称'
-) engine = InnoDB auto_increment = 5  comment = '基本销售属性表'
- ;
+    name varchar(20) not null                   comment '销售属性名称'
+) engine = InnoDB auto_increment = 1  comment = '基本销售属性表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for base_trademark
@@ -170,7 +169,7 @@ create table if not exists base_trademark
     id       bigint(20)   primary key auto_increment comment '编号',
     tm_name  varchar(100) not null                   comment '属性值',
     logo_url varchar(200)                            comment '品牌 logo 的图片路径'
-) engine = InnoDB auto_increment = 12  comment = '品牌表';
+) engine = InnoDB auto_increment = 1  comment = '品牌表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for cart_info
@@ -185,14 +184,14 @@ create table if not exists cart_info
     sku_num      int(11)                               comment '数量',
     img_url      varchar(200)                          comment '图片文件',
     sku_name     varchar(200)                          comment 'sku名称 (冗余)',
-    is_checked   int(1),
+    is_checked   int(1)                                comment '是否检查',
     create_time  datetime(0)                           comment '创建时间',
     operate_time datetime(0)                           comment '修改时间',
     is_ordered   bigint(20)                            comment '是否已经下单',
     order_time   datetime(0)                           comment '下单时间',
     source_type  varchar(20)                           comment '来源类型',
     source_id    bigint(20)                            comment '来源编号'
-) engine = InnoDB auto_increment = 30181 comment = '购物车表 用户登录系统时更新冗余';
+) engine = InnoDB auto_increment = 1 comment = '购物车表 用户登录系统时更新冗余';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for cms_banner
@@ -224,7 +223,7 @@ create table if not exists comment_info
     comment_txt  varchar(2000)                           comment '评价内容',
     create_time  datetime(0)                             comment '创建时间',
     operate_time datetime(0)                             comment '修改时间'
-) engine = InnoDB auto_increment = 100  comment = '商品评论表';
+) engine = InnoDB auto_increment = 1 comment = '商品评论表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for coupon_info
@@ -249,7 +248,7 @@ create table if not exists coupon_info
     operate_time     datetime(0)                           comment '修改时间',
     expire_time      datetime(0)                           comment '过期时间',
     range_desc       varchar(500)                          comment '范围描述'
-) engine = InnoDB auto_increment = 4 comment = '优惠券表';
+) engine = InnoDB auto_increment = 1 comment = '优惠券表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for coupon_range
@@ -261,7 +260,7 @@ create table if not exists coupon_range
     coupon_id  bigint(20)  not null default 0         comment '优惠券id',
     range_type varchar(10) not null default ''        comment '范围类型 1、商品(spuid) 2、品类(三级分类id) 3、品牌',
     range_id   bigint(20)  not null default 0
-) engine = InnoDB auto_increment = 4  comment = '优惠券范围表';
+) engine = InnoDB auto_increment = 1  comment = '优惠券范围表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for coupon_use
@@ -278,7 +277,7 @@ create table if not exists coupon_use
     using_time    datetime(0)                           comment '使用时间',
     used_time     datetime(0)                           comment '支付时间',
     expire_time   datetime(0)                           comment '过期时间'
-) engine = InnoDB auto_increment = 43598  comment = '优惠券领用表';
+) engine = InnoDB auto_increment = 1  comment = '优惠券领用表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for favor_info
@@ -293,7 +292,7 @@ create table if not exists favor_info
     is_cancel   varchar(1)                            comment '是否已取消 0 正常 1 已取消',
     create_time datetime(0)                           comment '创建时间',
     cancel_time datetime(0)                           comment '修改时间'
-) engine = InnoDB auto_increment = 1325455735210192908  comment = '商品收藏表';
+) engine = InnoDB auto_increment = 1  comment = '商品收藏表';
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -330,7 +329,7 @@ create table if not exists order_detail
     split_total_amount    decimal(16, 2),
     split_activity_amount decimal(16, 2),
     split_coupon_amount   decimal(16, 2)
-) engine = InnoDB auto_increment = 13030 comment = '订单明细表';
+) engine = InnoDB auto_increment = 1 comment = '订单明细表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for order_detail_activity
@@ -339,13 +338,13 @@ drop table if exists order_detail_activity;
 create table if not exists order_detail_activity
 (
     id               bigint(20) primary key auto_increment comment '编号',
-    order_id         bigint(20)                             comment '订单id',
-    order_detail_id  bigint(20)                             comment '订单明细id',
-    activity_id      bigint(20)                             comment '活动ID',
-    activity_rule_id bigint(20)                             comment '活动规则',
-    sku_id           bigint(20)                             comment 'skuID',
-    create_time      datetime(0)                            comment '获取时间'
-) engine = InnoDB auto_increment = 1661 comment = '订单明细购物券表';
+    order_id         bigint(20)                            comment '订单id',
+    order_detail_id  bigint(20)                            comment '订单明细id',
+    activity_id      bigint(20)                            comment '活动ID',
+    activity_rule_id bigint(20)                            comment '活动规则',
+    sku_id           bigint(20)                            comment 'skuID',
+    create_time      datetime(0)                           comment '获取时间'
+) engine = InnoDB auto_increment = 1 comment = '订单明细购物券表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for order_detail_coupon
@@ -360,7 +359,7 @@ create table if not exists order_detail_coupon
     coupon_use_id   bigint(20)                            comment '购物券领用id',
     sku_id          bigint(20)                            comment 'skuID',
     create_time     datetime(0)                           comment '获取时间'
-) engine = InnoDB auto_increment = 1325455744987115556 comment = '订单明细购物券表';
+) engine = InnoDB auto_increment = 1 comment = '订单明细购物券表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for order_info
@@ -393,7 +392,7 @@ create table if not exists order_info
     feight_fee             decimal(16, 2)                        comment '运费',
     feight_fee_reduce      decimal(16, 2)                        comment '运费减免',
     refundable_time        datetime(0)                           comment '可退款日期（签收后30天）'
-) engine = InnoDB auto_increment = 4863  comment = '订单表 订单表';
+) engine = InnoDB auto_increment = 1  comment = '订单表 订单表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for order_refund_info
@@ -420,11 +419,11 @@ create table if not exists order_refund_info
 drop table if exists order_status_log;
 create table if not exists order_status_log
 (
-    id           bigint(11)  primary key auto_increment,
+    id           bigint(11)   primary key auto_increment,
     order_id     bigint(11),
     order_status varchar(11),
     operate_time datetime(0)
-) engine = InnoDB auto_increment = 10355;
+) engine = InnoDB auto_increment = 1;
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for payment_info
@@ -435,7 +434,7 @@ create table if not exists payment_info
     id               int(11)        primary key auto_increment comment '编号',
     out_trade_no     varchar(50)                        comment '对外业务编号',
     order_id         bigint(50)                         comment '订单编号',
-    user_id          bigint(20),
+    user_id          bigint(20)                         comment '用户 ID',
     payment_type     varchar(20)                        comment '支付类型（微信 支付宝）',
     trade_no         varchar(50)                        comment '交易编号',
     total_amount     decimal(10, 2)                     comment '支付金额',
@@ -444,7 +443,7 @@ create table if not exists payment_info
     create_time      datetime(0)                        comment '创建时间',
     callback_time    datetime(0)                        comment '回调时间',
     callback_content text                               comment '回调信息'
-) engine = InnoDB auto_increment = 2565 comment = '支付信息表';
+) engine = InnoDB auto_increment = 1 comment = '支付信息表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for refund_payment
@@ -489,7 +488,7 @@ create table if not exists seckill_goods
     num             int(11)                                  comment '秒杀商品数',
     stock_count     int(11)                                  comment '剩余库存数',
     sku_desc        varchar(2000)                            comment '描述'
-) engine = InnoDB auto_increment = 1 ;
+) engine = InnoDB auto_increment = 1 comment = '商品秒杀表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for sku_attr_value
@@ -503,7 +502,7 @@ create table if not exists sku_attr_value
     sku_id     bigint(20)                            comment 'skuid',
     attr_name  varchar(30)                           comment '属性名',
     value_name varchar(30)                           comment '属性值名称'
-) engine = InnoDB auto_increment = 130  comment = 'sku 平台属性值关联表';
+) engine = InnoDB auto_increment = 1  comment = 'sku 平台属性值关联表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for sku_image
@@ -517,7 +516,7 @@ create table if not exists sku_image
     img_url    varchar(300)                             comment '图片路径(冗余)',
     spu_img_id bigint(20)                               comment '商品图片id',
     is_default varchar(4000)                            comment '是否默认'
-) engine = InnoDB auto_increment = 197  comment = '库存单元图片表';
+) engine = InnoDB auto_increment = 1  comment = '库存单元图片表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for sku_info
@@ -536,7 +535,7 @@ create table if not exists sku_info
     sku_default_img varchar(300)                              comment '默认显示图片(冗余)',
     is_sale         tinyint(3)     not null default 0         comment '是否销售（1：是 0：否）',
     create_time     datetime(0)                               comment '创建时间'
-) engine = InnoDB auto_increment = 36  comment = '库存单元表';
+) engine = InnoDB auto_increment = 1  comment = '库存单元表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for sku_sale_attr_value
@@ -551,7 +550,7 @@ create table if not exists sku_sale_attr_value
     sale_attr_id         bigint(20),
     sale_attr_name       varchar(30),
     sale_attr_value_name varchar(30)
-) engine = InnoDB auto_increment = 52 comment = 'sku销售属性值';
+) engine = InnoDB auto_increment = 1 comment = 'sku销售属性值';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for spu_image
@@ -563,7 +562,7 @@ create table if not exists spu_image
     spu_id   bigint(20)                              comment '商品id',
     img_name varchar(200)                            comment '图片名称',
     img_url  varchar(300)                            comment '图片路径'
-) engine = InnoDB auto_increment = 97 comment = '商品图片表';
+) engine = InnoDB auto_increment = 1 comment = '商品图片表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for spu_info
@@ -576,7 +575,7 @@ create table if not exists spu_info
     description  varchar(1000)                            comment '商品描述(后台简述）',
     category3_id bigint(20)                               comment '三级分类id',
     tm_id        bigint(20)                               comment '品牌id'
-) engine = InnoDB auto_increment = 13 comment = '商品表';
+) engine = InnoDB auto_increment = 1 comment = '商品表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for spu_poster
@@ -603,7 +602,7 @@ create table if not exists spu_sale_attr
     spu_id            bigint(20)                             comment '商品id',
     base_sale_attr_id bigint(20)                             comment '销售属性id',
     sale_attr_name    varchar(20)                            comment '销售属性名称(冗余)'
-) engine = InnoDB auto_increment = 17  comment = 'spu销售属性';
+) engine = InnoDB auto_increment = 1 comment = 'spu销售属性';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for spu_sale_attr_value
@@ -616,7 +615,7 @@ create table if not exists spu_sale_attr_value
     base_sale_attr_id    bigint(20)                             comment '销售属性id',
     sale_attr_value_name varchar(20)                            comment '销售属性值名称',
     sale_attr_name       varchar(20)                            comment '销售属性名称(冗余)'
-) engine = InnoDB auto_increment = 38 comment = 'spu销售属性值';
+) engine = InnoDB auto_increment = 1 comment = 'spu销售属性值';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for user_address
@@ -653,7 +652,7 @@ create table if not exists user_info
     create_time  datetime(0)                             comment '创建时间',
     operate_time datetime(0)                             comment '修改时间',
     status       varchar(200)                            comment '状态'
-) engine = InnoDB auto_increment = 201 ;
+) engine = InnoDB auto_increment = 201 comment = '用户详细信息表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for ware_info
@@ -661,7 +660,7 @@ create table if not exists user_info
 drop table if exists ware_info;
 create table if not exists ware_info
 (
-    id        bigint(20)   primary key , 
+    id        bigint(20)    primary key , 
     name      varchar(200), 
     address   varchar(200), 
     area_code varchar(20)
@@ -686,7 +685,7 @@ create table if not exists ware_order_task
     create_time      datetime(0)                              comment '创建时间',
     ware_id          bigint(20)                               comment '仓库编号',
     task_comment     varchar(500)                             comment '工作单备注'
-) engine = InnoDB auto_increment = 1 comment = '库存工作单表 库存工作单表';
+) engine = InnoDB auto_increment = 1 comment = '库存工作单表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for ware_order_task_detail
@@ -700,7 +699,7 @@ create table if not exists ware_order_task_detail
     sku_num       int(11)                               comment '购买个数',
     task_id       bigint(20)                            comment '工作单编号',
     refund_status varchar(20)
-) engine = InnoDB auto_increment = 1 comment = '库存工作单明细表 库存工作单明细表';
+) engine = InnoDB auto_increment = 1 comment = '库存工作单明细表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for ware_sku
@@ -720,17 +719,16 @@ create table if not exists ware_sku
 -- View structure for base_category_view
 -- -------------------------------------------------------------------------------------------------
 drop view if exists base_category_view;
-create algorithm = undefined sql security definer view base_category_view as
-    select base_category3.id   as id,
-           base_category1.id   as category1_id,
-           base_category1.name as category1_name,
-           base_category2.id   as category2_id,
-           base_category2.name as category2_name,
-           base_category3.id   as category3_id,
-           base_category3.name as category3_name
-    from 
-    (
-         (
-             base_category1 join base_category2 on base_category1.id = base_category2.category1_id
-         )                  join base_category3 on base_category2.id = base_category3.category2_id
-    );
+# create algorithm = undefined sql security definer view base_category_view as
+create view base_category_view as
+select b3.id   as id,
+       b1.id   as category1_id,
+       b1.name as category1_name,
+       b2.id   as category2_id,
+       b2.name as category2_name,
+       b3.id   as category3_id,
+       b3.name as category3_name
+from base_category1 as b1 join base_category2 as b2 
+    on b1.id = b2.category1_id
+join base_category3 as b3 
+    on b2.id = b3.category2_id;

@@ -36,7 +36,7 @@ function service_status()
     elif [ "${pid_count}" -le 1 ]; then
         echo "${STOP_STATUS}"
     else
-        echo "    查看程序是否有重复使用的状况 ......"
+        echo "    查看程序是否有重复使用的状况 ...... "
     fi
 }
 
@@ -48,7 +48,7 @@ function service_start()
     
     # 2. 若程序运行状态为停止，则运行程序，否则打印程序正在运行
     if [ "${status}" == "${STOP_STATUS}" ]; then
-        echo "    程序（${ALIAS_NAME}）正在加载中 ......"
+        echo "    程序（${ALIAS_NAME}）正在加载中 ...... "
         
         # 数据 业务日期 修改，数据正常生成
         sed -i "s#mock.date =.*#mock.date = ${MOCK_DATE}#g"  "${SERVICE_DIR}/${PROFILE}"
