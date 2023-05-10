@@ -9,11 +9,11 @@ show tables ;
 drop table if exists ods_log_inc;
 create external table  if not exists ods_log_inc
 (
-	common   struct<ar: string, ba: string,  ch: string, is_new: string, md: string, mid: string, os: string, uid: string, vc:string> comment '公共信息',
-	page     struct<during_time: string, item: string, item_type: string, last_page_id: string, page_id: string, source_type:string>  comment '页面信息',
-	actions  array<struct<action_id: string,  item: string,  item_type: string,  ts:bigint>>                                          comment '动作信息',
-	displays array<struct<display_type: string, item: string, item_type: string, `order`: string, pos_id:string>>                      comment '曝光信息',
-	`start`   struct<entry: string, loading_time :bigint,open_ad_id :bigint,open_ad_ms :bigint,open_ad_skip_ms:bigint>                 comment '启动信息',
+	common   struct<ar: string, ba: string, ch: string, is_new: string, md: string, mid: string, os: string, uid: string, vc: string> comment '公共信息',
+	page     struct<during_time: string, item: string, item_type: string, last_page_id: string, page_id: string, source_type: string> comment '页面信息',
+	actions  array<struct<action_id: string,  item: string,  item_type: string,  ts: bigint>>                                         comment '动作信息',
+	displays array<struct<display_type: string, item: string, item_type: string, `order`: string, pos_id: string>>                     comment '曝光信息',
+	`start`   struct<entry: string, loading_time: bigint, open_ad_id: bigint, open_ad_ms: bigint, open_ad_skip_ms: bigint>             comment '启动信息',
 	err      struct<error_code: bigint, msg: string>                                                                                  comment '错误信息',
 	ts       bigint                                                                                                                   comment '时间戳'
 ) comment '活动信息表' partitioned by (dt string) 
@@ -21,8 +21,8 @@ create external table  if not exists ods_log_inc
     location '/warehouse/ods/ods_log_inc/';
 
 -- 数据装载
-load data inpath '/warehouse/origin/mock/2021-08-15' into table ods_log_inc partition(dt='2021-08-15');
--- 每日数据装载脚本：hdfs_to_ods_log.sh 2021-08-15
+-- load data inpath '/warehouse/log/2021-08-15' into table ods_log_inc partition(dt='2021-08-15');
+-- 行为日志装载脚本：hdfs-ods.sh ods_log_inc 2021-08-15
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -81,8 +81,8 @@ create external table  if not exists ods_base_category1_full
 drop table if exists ods_base_category2_full;
 create external table  if not exists ods_base_category2_full
 (
-	id string           comment '编号', 
-	name string         comment '二级分类名称', 
+	id           string comment '编号', 
+	name         string comment '二级分类名称', 
 	category1_id string comment '一级分类编号'
 ) comment '二级品类表' partitioned by (dt string) 
     row format delimited fields terminated by '\t' null defined as '' 
@@ -119,7 +119,6 @@ create external table  if not exists ods_base_dic_full
     row format delimited fields terminated by '\t' null defined as '' 
     location '/warehouse/ods/ods_base_dic_full/';
 
-load data inpath '/warehouse/origin/db/base_dic_full/' into table ods_base_dic_full partition(dt='2021-08-15');
 
 -- -------------------------------------------------------------------------------------------------
 -- 省份表（全量表）
@@ -159,7 +158,7 @@ create external table  if not exists ods_base_trademark_full
 (
 	id       string comment '编号', 
 	tm_name  string comment '品牌名称', 
-	logo_url string comment '品牌logo的图片路径'
+	logo_url string comment '品牌 logo 的图片路径'
 ) comment '品牌表' partitioned by (dt string) 
     row format delimited fields terminated by '\t' null defined as '' 
     location '/warehouse/ods/ods_base_trademark_full/';
@@ -172,12 +171,12 @@ drop table if exists ods_cart_info_full;
 create external table  if not exists ods_cart_info_full
 (
 	id           string         comment '编号',
-	user_id      string         comment '用户id',
-	sku_id       string         comment 'sku_id',
+	user_id      string         comment '用户 ID',
+	sku_id       string         comment 'SKU_ID',
 	cart_price   decimal(16, 2) comment '放入购物车时价格',
 	sku_num      bigint         comment '数量',
 	img_url      bigint         comment '商品图片地址',
-	sku_name     string         comment 'sku名称 (冗余)',
+	sku_name     string         comment 'sku 名称 (冗余)',
 	is_checked   string         comment '是否被选中',
 	create_time  string         comment '创建时间',
 	operate_time string         comment '修改时间',
@@ -198,14 +197,14 @@ create external table  if not exists ods_coupon_info_full
 (
 	id               string         comment '购物券编号',
 	coupon_name      string         comment '购物券名称',
-	coupon_type      string         comment '购物券类型 1 现金券 2 折扣券 3 满减券 4 满件打折券',
+	coupon_type      string         comment '购物券类型：1，现金券；2，折扣券；3，满减券；4，满件打折券',
 	condition_amount decimal(16, 2) comment '满额数',
 	condition_num    bigint         comment '满件数',
 	activity_id      string         comment '活动编号',
 	benefit_amount   decimal(16, 2) comment '减金额',
 	benefit_discount decimal(16, 2) comment '折扣',
 	create_time      string         comment '创建时间',
-	range_type       string         comment '范围类型 1、商品 2、品类 3、品牌',
+	range_type       string         comment '范围类型：1，商品；2，品类；3，品牌',
 	limit_num        bigint         comment '最多领用次数',
 	taken_count      bigint         comment '已领用次数',
 	start_time       string         comment '开始领取时间',
@@ -224,12 +223,12 @@ drop table if exists ods_sku_attr_value_full;
 create external table  if not exists ods_sku_attr_value_full
 (
 	id         string comment '编号',
-	attr_id    string comment '平台属性ID',
-	value_id   string comment '平台属性值ID',
-	sku_id     string comment '商品ID',
+	attr_id    string comment '平台属性 ID',
+	value_id   string comment '平台属性值 ID',
+	sku_id     string comment '商品 ID',
 	attr_name  string comment '平台属性名称',
 	value_name string comment '平台属性值名称'
-) comment 'sku平台属性表' partitioned by (dt string) 
+) comment 'SKU 平台属性表' partitioned by (dt string) 
     row format delimited fields terminated by '\t' null defined as '' 
     location '/warehouse/ods/ods_sku_attr_value_full/';
 
@@ -240,18 +239,18 @@ create external table  if not exists ods_sku_attr_value_full
 drop table if exists ods_sku_info_full;
 create external table  if not exists ods_sku_info_full
 (
-	id              string         comment 'skuId',
-	spu_id          string         comment 'spuid',
+	id              string         comment 'SKU_ID',
+	spu_id          string         comment 'SPU_ID',
 	price           decimal(16, 2) comment '价格',
 	sku_name        string         comment '商品名称',
 	sku_desc        string         comment '商品描述',
 	weight          decimal(16, 2) comment '重量',
-	tm_id           string         comment '品牌id',
-	category3_id    string         comment '品类id',
+	tm_id           string         comment '品牌 ID',
+	category3_id    string         comment '品类 ID',
 	sku_default_igm string         comment '商品图片地址',
 	is_sale         string         comment '是否在售',
 	create_time     string         comment '创建时间'
-) comment 'SKU商品表' partitioned by (dt string) 
+) comment 'SKU 商品表' partitioned by (dt string) 
     row format delimited fields terminated by '\t' null defined as '' 
     location '/warehouse/ods/ods_sku_info_full/';
 
@@ -263,8 +262,8 @@ drop table if exists ods_sku_sale_attr_value_full;
 create external table  if not exists ods_sku_sale_attr_value_full
 (
 	id                   string comment '编号',
-	sku_id               string comment 'sku_id',
-	spu_id               string comment 'spu_id',
+	sku_id               string comment 'SKU_ID',
+	spu_id               string comment 'SPU_ID',
 	sale_attr_value_id   string comment '销售属性值id',
 	sale_attr_id         string comment '销售属性id',
 	sale_attr_name       string comment '销售属性名称',
@@ -280,11 +279,11 @@ create external table  if not exists ods_sku_sale_attr_value_full
 drop table if exists ods_spu_info_full;
 create external table  if not exists ods_spu_info_full
 (
-	id           string comment 'spu_id',
-	spu_name     string comment 'spu名称',
+	id           string comment 'SPU_ID',
+	spu_name     string comment 'SPU 名称',
 	description  string comment '描述信息',
-	category3_id string comment '品类id',
-	tm_id        string comment '品牌id'
+	category3_id string comment '品类 ID',
+	tm_id        string comment '品牌 ID'
 ) comment 'SPU商品表' partitioned by (dt string) 
     row format delimited fields terminated by '\t' null defined as '' 
     location '/warehouse/ods/ods_spu_info_full/';
@@ -299,7 +298,7 @@ create external table  if not exists ods_cart_info_inc
 	type string                                                                                            comment '变动类型',
 	ts   bigint                                                                                            comment '变动时间',
 	data struct<id: string,          user_id: string,      sku_id: string,     cart_price: decimal(16, 2),
-	           sku_num :bigint,      img_url: string,      sku_name: string,   is_checked: string,  
+	           sku_num: bigint,      img_url: string,      sku_name: string,   is_checked: string,  
 	           create_time: string,  operate_time: string, is_ordered: string, order_time: string,  
 	           source_type: string,  source_id: string>                                                    comment '数据',
 	old  map<string, string>                                                                               comment '旧值'
@@ -314,12 +313,12 @@ create external table  if not exists ods_cart_info_inc
 drop table if exists ods_comment_info_inc;
 create external table  if not exists ods_comment_info_inc
 (
-	type string                                                                              comment '变动类型',
-	ts   bigint                                                                              comment '变动时间',
-	data struct<id: string,          user_id: string,      nick_name: string,  head_img: string,  
-	            sku_id: string,      spu_id: string,       order_id: string,   appraise: string,  
-	            comment_txt: string, create_time: string, operate_time :string>             comment '数据',
-	old  map<string, string>                                                                 comment '旧值'
+	type string                                                                                   comment '变动类型',
+	ts   bigint                                                                                   comment '变动时间',
+	data struct<id: string,          user_id: string,     nick_name: string,    head_img: string,  
+	            sku_id: string,      spu_id: string,      order_id: string,     appraise: string,  
+	            comment_txt: string, create_time: string, operate_time :string>                   comment '数据',
+	old  map<string, string>                                                                      comment '旧值'
 ) comment '评价表' partitioned by (dt string) 
     row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
     location '/warehouse/ods/ods_comment_info_inc/';
@@ -331,11 +330,11 @@ create external table  if not exists ods_comment_info_inc
 drop table if exists ods_coupon_use_inc;
 create external table  if not exists ods_coupon_use_inc
 (
-	type string comment '变动类型',
-	ts   bigint comment '变动时间',
+	type string                                                                  comment '变动类型',
+	ts   bigint                                                                  comment '变动时间',
 	data struct<id: string,         coupon_id: string,     user_id: string,  
 	            order_id: string,   coupon_status: string, get_time: string,  
-	            using_time: string, used_time: string,     expire_time :string> comment '数据',
+	            using_time: string, used_time: string,     expire_time :string>  comment '数据',
 	old  map<string, string>                                                     comment '旧值'
 ) comment '优惠券领用表' partitioned by (dt string) 
     row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
@@ -348,11 +347,11 @@ create external table  if not exists ods_coupon_use_inc
 drop table if exists ods_favor_info_inc;
 create external table  if not exists ods_favor_info_inc
 (
-	type string                                                                             comment '变动类型',
-	ts   bigint                                                                             comment '变动时间',
-	data struct<id: string,        user_id: string,     sku_id: string,  spu_id: string,  
-	            is_cancel: string, create_time: string, cancel_time: string>                comment '数据',
-	old  map<string, string>                                                                comment '旧值'
+	type string                                                                              comment '变动类型',
+	ts   bigint                                                                              comment '变动时间',
+	data struct<id: string,        user_id: string,     sku_id: string,      spu_id: string,   
+	            is_cancel: string, create_time: string, cancel_time: string>                 comment '数据',
+	old  map<string, string>                                                                 comment '旧值'
 ) comment '收藏表' partitioned by (dt string) 
     row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
     location '/warehouse/ods/ods_favor_info_inc/';
@@ -388,7 +387,9 @@ create external table  if not exists ods_order_detail_activity_inc
 	data struct<id: string,               order_id: string,  order_detail_id: string,  activity_id: string,  
 	            activity_rule_id: string, sku_id: string,    create_time : string>                          comment '数据',
 	old  map<string, string>                                                                                comment '旧值'
-) comment '订单明细活动关联表' partitioned by (dt string) row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' location '/warehouse/ods/ods_order_detail_activity_inc/';
+) comment '订单明细活动关联表' partitioned by (dt string) 
+    row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
+    location '/warehouse/ods/ods_order_detail_activity_inc/';
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -402,7 +403,9 @@ create external table  if not exists ods_order_detail_coupon_inc
 	data struct<id: string,            order_id: string, order_detail_id: string,  coupon_id: string,  
 	            coupon_use_id: string, sku_id: string,   create_time: string>                         comment '数据',
 	old  map<string, string>                                                                          comment '旧值'
-) comment '订单明细优惠券关联表' partitioned by (dt string) row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' location '/warehouse/ods/ods_order_detail_coupon_inc/';
+) comment '订单明细优惠券关联表' partitioned by (dt string) 
+    row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
+    location '/warehouse/ods/ods_order_detail_coupon_inc/';
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -411,18 +414,18 @@ create external table  if not exists ods_order_detail_coupon_inc
 drop table if exists ods_order_info_inc;
 create external table  if not exists ods_order_info_inc
 (
-	type string                                                                                                                    comment '变动类型',
-	ts   bigint                                                                                                                    comment '变动时间',
-	data struct<id: string,                            consignee: string,                     consignee_tel: string,  
-	            total_amount: decimal(16, 2),          order_status: string,                  user_id: string,  
-	            payment_way: string,                   delivery_address: string,              order_comment: string,  
-	            out_trade_no: string,                  trade_body: string,                    create_time: string,  
-	            operate_time: string,                  expire_time: string,                   process_status: string,  
-	            tracking_no: string,                   parent_order_id: string,               img_url: string,  
-	            province_id: string,                   activity_reduce_amount:decimal(16, 2), coupon_reduce_amount: decimal(16, 2),
-	            original_total_amount :decimal(16, 2), freight_fee: decimal(16, 2),           freight_fee_reduce: decimal(16, 2),
-	            refundable_time: decimal(16, 2)>                                                                                   comment '数据',
-	old  map<string, string>                                                                                                       comment '旧值'
+	type string                                                                                                                      comment '变动类型',
+	ts   bigint                                                                                                                      comment '变动时间',
+	data struct<id: string,                            consignee: string,                      consignee_tel: string,  
+	            total_amount: decimal(16, 2),          order_status: string,                   user_id: string,  
+	            payment_way: string,                   delivery_address: string,               order_comment: string,  
+	            out_trade_no: string,                  trade_body: string,                     create_time: string,  
+	            operate_time: string,                  expire_time: string,                    process_status: string,  
+	            tracking_no: string,                   parent_order_id: string ,               img_url: string,  
+	            province_id: string,                   activity_reduce_amount: decimal(16, 2), coupon_reduce_amount: decimal(16, 2),
+	            original_total_amount: decimal(16, 2), freight_fee: decimal(16, 2),            freight_fee_reduce: decimal(16, 2),
+	            refundable_time: decimal(16, 2)>                                                                                     comment '数据',
+	old  map<string, string>                                                                                                         comment '旧值'
 ) comment '订单表' partitioned by (dt string) 
     row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
     location '/warehouse/ods/ods_order_info_inc/';
@@ -437,9 +440,9 @@ create external table  if not exists ods_order_refund_info_inc
 	type string                                                                                       comment '变动类型',
 	ts   bigint                                                                                       comment '变动时间',
 	data struct<id: string,                    user_id: string,            order_id: string,  
-	            sku_id: string,                refund_type: string,        refund_num :bigint,
+	            sku_id: string,                refund_type: string,        refund_num: bigint,
 	            refund_amount: decimal(16, 2), refund_reason_type: string, refund_reason_txt: string,  
-	            refund_status: string,         create_time:string>                                    comment '数据',
+	            refund_status: string,         create_time: string>                                   comment '数据',
 	old  map<string, string>                                                                          comment '旧值'
 ) comment '退单表' partitioned by (dt string) 
     row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
@@ -467,8 +470,8 @@ create external table  if not exists ods_order_status_log_inc
 drop table if exists ods_payment_info_inc;
 create external table  if not exists ods_payment_info_inc
 (
-	type string                                                                               comment '变动类型',
-	ts   bigint                                                                               comment '变动时间',
+	type string                                                                                comment '变动类型',
+	ts   bigint                                                                                comment '变动时间',
 	data struct<id: string,                   out_trade_no: string,  order_id: string,  
 	            user_id: string,              payment_type: string,  trade_no: string,  
 	            total_amount: decimal(16, 2), subject: string,       payment_status: string,  
@@ -503,16 +506,16 @@ create external table  if not exists ods_refund_payment_inc
 drop table if exists ods_user_info_inc;
 create external table  if not exists ods_user_info_inc
 (
-	type string                                                             comment '变动类型',
-	ts   bigint                                                             comment '变动时间',
-	data struct<id: string,       login_name: string,  nick_name: string,  
-	            passwd: string,   name: string,        phone_num: string,  
-	            email: string,    head_img: string,    user_level: string,  
-	            birthday: string, gender: string,      create_time: string,  
-	            operate_time: string,  status :string>                      comment '数据',
-	old  map<string, string>                                                comment '旧值'
+	type string                                                                 comment '变动类型',
+	ts   bigint                                                                 comment '变动时间',
+	data struct<id: string,           login_name: string,  nick_name: string,  
+	            passwd: string,       name: string,        phone_num: string,  
+	            email: string,        head_img: string,    user_level: string,  
+	            birthday: string,     gender: string,      create_time: string,  
+	            operate_time: string, `status`: string>                          comment '数据',
+	old  map<string, string>                                                    comment '旧值'
 ) comment '用户表' partitioned by (dt string) 
     row format serde 'org.apache.hadoop.hive.serde2.JsonSerDe' 
     location '/warehouse/ods/ods_user_info_inc/';
 
--- 业务表数据装载脚本：hdfs_ods_db.sh all 2021-08-15
+-- 业务表数据装载脚本：hdfs-ods.sh db 2021-08-15
