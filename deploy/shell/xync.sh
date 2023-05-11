@@ -9,9 +9,9 @@
 # =========================================================================================
 
 
-HOST_LIST=(master slaver1 slaver2 slaver3)
-TARGET_PATH=$(pwd)/
-USER=$(whoami)
+HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机
+TARGET_PATH=$(pwd)/                                        # 目标路径
+USER=$(whoami)                                             # 获取当前登录用户
 
 # 1. 判断输入的参数个数，以及是文件夹还是文件
 if [ "$#" -gt 1 ]; then
@@ -33,9 +33,12 @@ fi
 # 2. 遍历循环读取主机 ${HOST_LIST[@]}
 for host_name in "${HOST_LIST[@]}"
 do
-    echo "============================== 向主机（${host_name}）同步数据 =============================="    
+    printf "\n=================================== 向主机（${host_name}）同步数据 ===================================\n"    
     # rsync -rvl --delete  "${TARGET_PATH}"  "${USER}@${host_name}:${TARGET_PATH}"
     
     # 执行同步
     rsync -zav --delete  "${TARGET_PATH}"  "${USER}@${host_name}:${TARGET_PATH}"
 done
+
+printf "\n======================================== 数据同步结束 ========================================\n\n"
+exit 0
