@@ -1,8 +1,19 @@
-#!/user/bin/env bash
+#!/usr/bin/env bash
 
-
+# =========================================================================================
+#    FileName      ：  ods-dim.sh
+#    CreateTime    ：  2023-03-26 01:44
+#    Author        ：  lihua shiyu
+#    Email         ：  lihuashiyu@github.com
+#    Description   ：  ods-dim.sh 被用于 ==> 将 ODS 层数据加载到 DIM 
+# =========================================================================================
+    
+    
 # 定义变量方便修改
+SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
+HIVE_HOME=/opt/apache/hive                                 # Hive 的安装位置
 HIVE_DATA_BASE=warehouse                                   # Hive 的数据库名称
+LOG_FILE="ods-dim-$(date +%F).log"                    # 执行日志
 
 
 # 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天
@@ -14,35 +25,35 @@ fi
 
 dim_user_zip="
     set hive.exec.dynamic.partition.mode=nonstrict;
-    with tmp as
+    with tmp as 
     (
-        select old.id old_id,
-               old.login_name old_login_name,
-               old.nick_name old_nick_name,
-               old.name old_name,
-               old.phone_num old_phone_num,
-               old.email old_email,
-               old.user_level old_user_level,
-               old.birthday old_birthday,
-               old.gender old_gender,
-               old.create_time old_create_time,
-               old.operate_time old_operate_time,
-               old.start_date old_start_date,
-               old.end_date old_end_date,
-               new.id new_id,
-               new.login_name new_login_name,
-               new.nick_name new_nick_name,
-               new.name new_name,
-               new.phone_num new_phone_num,
-               new.email new_email,
-               new.user_level new_user_level,
-               new.birthday new_birthday,
-               new.gender new_gender,
-               new.create_time new_create_time,
-               new.operate_time new_operate_time,
-               new.start_date new_start_date,
-               new.end_date new_end_date
-        from
+        select old.id           as old_id,
+               old.login_name   as old_login_name,
+               old.nick_name    as old_nick_name,
+               old.name         as old_name,
+               old.phone_num    as old_phone_num,
+               old.email        as old_email,
+               old.user_level   as old_user_level,
+               old.birthday     as old_birthday,
+               old.gender       as old_gender,
+               old.create_time  as old_create_time,
+               old.operate_time as old_operate_time,
+               old.start_date   as old_start_date,
+               old.end_date     as old_end_date,
+               new.id           as new_id,
+               new.login_name   as new_login_name,
+               new.nick_name    as new_nick_name,
+               new.name         as new_name,
+               new.phone_num    as new_phone_num,
+               new.email        as new_email,
+               new.user_level   as new_user_level,
+               new.birthday     as new_birthday,
+               new.gender       as new_gender,
+               new.create_time  as new_create_time,
+               new.operate_time as new_operate_time,
+               new.start_date   as new_start_date,
+               new.end_date     as new_end_date
+        from 
         (
             select id,
                    login_name,
@@ -59,75 +70,73 @@ dim_user_zip="
                    end_date
             from ${HIVE_DATA_BASE}.dim_user_zip
             where dt = '9999-12-31'
-        ) old full outer join
+        ) as old full outer join 
         (
             select id,
                    login_name,
                    nick_name,
-                   md5(name) name,
-                   md5(phone_num)    phone_num,
-                   md5(email) email,
+                   md5(name)      as name,
+                   md5(phone_num) as phone_num,
+                   md5(email)     as email,
                    user_level,
                    birthday,
                    gender,
                    create_time,
                    operate_time,
-                   '${do_date}'      start_date,
-                   '9999-12-31'      end_date
-            from
-            (
-                select data.id,
-                       data.login_name,
-                       data.nick_name,
-                       data.name,
-                       data.phone_num,
-                       data.email,
-                       data.user_level,
-                       data.birthday,
-                       data.gender,
-                       data.create_time,
-                       data.operate_time,
-                       row_number() over (partition by data.id order by ts desc) rn
-                from ${HIVE_DATA_BASE}.ods_user_info_inc
-                where dt = '${do_date}'
-            ) t1 where rn = 1
-        ) new on old.id = new.id
+                   '${do_date}'   as start_date,
+                   '9999-12-31'   as end_date    
+	        from     
+	        (    
+	            select data.id,    
+	                   data.login_name,    
+	                   data.nick_name,    
+	                   data.name,    
+	                   data.phone_num,    
+	                   data.email,    
+	                   data.user_level,    
+	                   data.birthday,    
+	                   data.gender,    
+	                   data.create_time,    
+	                   data.operate_time,    
+	                   row_number() over (partition by data.id order by ts desc) as rn    
+		        from ${HIVE_DATA_BASE}.ods_user_info_inc    
+		        where dt = '${do_date}'    
+	        ) as t1 where rn = 1
+        ) as new on old.id = new.id
     )
-    insert overwrite table ${HIVE_DATA_BASE}.dim_user_zip partition(dt)
-        select
-            if(new_id is not null, new_id,           old_id),
-            if(new_id is not null, new_login_name,   old_login_name),
-            if(new_id is not null, new_nick_name,    old_nick_name),
-            if(new_id is not null, new_name,         old_name),
-            if(new_id is not null, new_phone_num,    old_phone_num),
-            if(new_id is not null, new_email,        old_email),
-            if(new_id is not null, new_user_level,   old_user_level),
-            if(new_id is not null, new_birthday,     old_birthday),
-            if(new_id is not null, new_gender,       old_gender),
-            if(new_id is not null, new_create_time,  old_create_time),
-            if(new_id is not null, new_operate_time, old_operate_time),
-            if(new_id is not null, new_start_date,   old_start_date),
-            if(new_id is not null, new_end_date,     old_end_date),
-            if(new_id is not null, new_end_date,     old_end_date) dt
-        from tmp
-        union all
-        select
-            old_id,
-            old_login_name,
-            old_nick_name,
-            old_name,
-            old_phone_num,
-            old_email,
-            old_user_level,
-            old_birthday,
-            old_gender,
-            old_create_time,
-            old_operate_time,
-            old_start_date,
-            cast(date_add('${do_date}', -1) as string) old_end_date,
-            cast(date_add('${do_date}', -1) as string) dt
-        from tmp
-        where old_id is not null and new_id is not null;
+    insert overwrite table dim_user_zip partition(dt)
+    select if(new_id is not null, new_id,           old_id),
+           if(new_id is not null, new_login_name,   old_login_name),
+           if(new_id is not null, new_nick_name,    old_nick_name),
+           if(new_id is not null, new_name,         old_name),
+           if(new_id is not null, new_phone_num,    old_phone_num),
+           if(new_id is not null, new_email,        old_email),
+           if(new_id is not null, new_user_level,   old_user_level),
+           if(new_id is not null, new_birthday,     old_birthday),
+           if(new_id is not null, new_gender,       old_gender),
+           if(new_id is not null, new_create_time,  old_create_time),
+           if(new_id is not null, new_operate_time, old_operate_time),
+           if(new_id is not null, new_start_date,   old_start_date),
+           if(new_id is not null, new_end_date,     old_end_date),
+           if(new_id is not null, new_end_date,     old_end_date) dt
+    from tmp 
+    union all
+    select old_id,
+           old_login_name,
+           old_nick_name,
+           old_name,
+           old_phone_num,
+           old_email,
+           old_user_level,
+           old_birthday,
+           old_gender,
+           old_create_time,
+           old_operate_time,
+           old_start_date,
+           cast(date_add('${do_date}', -1) as string) as old_end_date,
+           cast(date_add('${do_date}', -1) as string) as dt
+    from tmp
+    where old_id is not null and new_id is not null;
     "
 
 dim_sku_full="
@@ -186,7 +195,16 @@ dim_sku_full="
     attr as
     (
         select sku_id,
-               collect_set(named_struct('attr_id', attr_id, 'value_id', value_id, 'attr_name', attr_name, 'value_name', value_name)) attrs
+               collect_set
+               (
+                   named_struct
+                   (
+                       'attr_id',    attr_id, 
+                       'value_id',   value_id, 
+                       'attr_name',  attr_name, 
+                       'value_name', value_name
+                   )
+               )                 as attrs
         from ${HIVE_DATA_BASE}.ods_sku_attr_value_full
         where dt = '${do_date}'
         group by sku_id
@@ -194,7 +212,16 @@ dim_sku_full="
     sale_attr as
     (
         select sku_id,
-               collect_set(named_struct('sale_attr_id', sale_attr_id, 'sale_attr_value_id', sale_attr_value_id, 'sale_attr_name', sale_attr_name, 'sale_attr_value_name', sale_attr_value_name)) sale_attrs
+               collect_set
+               (
+                   named_struct
+                   (  
+                       'sale_attr_id',         sale_attr_id, 
+                       'sale_attr_value_id',   sale_attr_value_id, 
+                       'sale_attr_name',       sale_attr_name, 
+                       'sale_attr_value_name', sale_attr_value_name
+                   )
+               )                as sale_attrs
         from ${HIVE_DATA_BASE}.ods_sku_sale_attr_value_full
         where dt = '${do_date}'
         group by sku_id
@@ -332,8 +359,8 @@ insert overwrite table ${HIVE_DATA_BASE}.dim_activity_full partition(dt = '${do_
             benefit_amount,
             benefit_discount,
             case rule.activity_type
-                when '3101' then concat('满 ', condition_amount, ' 元减',benefit_amount, ' 元')
-                when '3102' then concat('满 ', condition_num, ' 件打', 10 * (1 - benefit_discount), ' 折')
+                when '3101' then concat('满 ', condition_amount,            ' 元减 ', benefit_amount,              ' 元')
+                when '3102' then concat('满 ', condition_num,               ' 件打 ', 10 * (1 - benefit_discount), ' 折')
                 when '3103' then concat('打 ', 10 * (1 - benefit_discount), ' 折')
             end benefit_rule,
             benefit_level
@@ -349,7 +376,7 @@ insert overwrite table ${HIVE_DATA_BASE}.dim_activity_full partition(dt = '${do_
                benefit_level
         from ${HIVE_DATA_BASE}.ods_activity_rule_full
         where dt = '${do_date}'
-    ) rule left join
+    ) as rule left join
     (
         select id,
                activity_name,
@@ -360,41 +387,67 @@ insert overwrite table ${HIVE_DATA_BASE}.dim_activity_full partition(dt = '${do_
                create_time
         from ${HIVE_DATA_BASE}.ods_activity_info_full
         where dt='${do_date}'
-    ) info on rule.activity_id = info.id left join
+    ) as info 
+        on rule.activity_id = info.id left join
     (
         select dic_code, 
                dic_name
         from ${HIVE_DATA_BASE}.ods_base_dic_full
         where dt = '${do_date}' and parent_code = '31'
-    ) dic on rule.activity_type = dic.dic_code;
+    ) as dic on rule.activity_type = dic.dic_code;
 "
 
-printf "\n============================== 运行开始 ==============================\n"
+# 执行 Hive Sql
+function execute_hive_sql()
+{
+    sql="$*"
+    echo "${sql}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${HIVE_HOME}/bin/hive -e "${sql}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+}
+
+
+printf "\n======================================== 数据加载开始 ========================================\n"
 case $1 in
-    "dim_user_zip")
-        hive -e "${dim_user_zip}"
+    dim_user_zip)
+        execute_hive_sql "${dim_user_zip}"
     ;;
     
-    "dim_sku_full")
-        hive -e "${dim_sku_full}"
+    dim_sku_full)
+        execute_hive_sql "${dim_sku_full}"
     ;;
     
-    "dim_province_full")
-        hive -e "${dim_province_full}"
+    dim_province_full)
+        execute_hive_sql "${dim_province_full}"
     ;;
     
-    "dim_coupon_full")
-        hive -e "${dim_coupon_full}"
+    dim_coupon_full)
+        execute_hive_sql "${dim_coupon_full}"
     ;;
     
-    "dim_activity_full")
-        hive -e "${dim_activity_full}"
+    dim_activity_full)
+        execute_hive_sql "${dim_activity_full}"
     ;;
     
-    "all")
-        hive -e "${dim_user_zip}    ${dim_sku_full}      ${dim_province_full} \
-                 ${dim_coupon_full} ${dim_activity_full}"
+    all)
+        execute_hive_sql "${dim_user_zip}"     "${dim_sku_full}"       "${dim_province_full}" \
+                         "${dim_coupon_full}"  "${dim_activity_full}"
+    ;;
+    
+    *)
+        echo "    脚本可传入两个参数，使用方法：/path/$(basename $0) arg1 [arg2] ： "
+        echo "        arg1：表名，必填，如下表所示；arg2：日期（yyyy-mm-dd），可选，默认昨天 "
+        echo "        +---------------------+----------------+ "
+        echo "        |       参   数       |     描  述     | "
+        echo "        +---------------------+----------------+ "
+        echo "        |  dim_sku_full       |  商品维度表    | "    
+        echo "        |  dim_coupon_full    |  优惠券维度表  | "    
+        echo "        |  dim_activity_full  |  活动维度表    | "    
+        echo "        |  dim_province_full  |  地区维度表    | "        
+        echo "        |  dim_user_zip       |  用户维度表    | "    
+        echo "        |  all                |  所有 DIM 表   | "    
+        echo "        +---------------------+----------------+ "
     ;;
 esac
-printf "============================== 运行结束 ==============================\n\n"
 
+printf "======================================== 运行结束 ========================================\n\n"
+exit 0
