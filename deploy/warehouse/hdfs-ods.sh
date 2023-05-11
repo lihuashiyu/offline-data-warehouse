@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 
-
 # =========================================================================================
 #    FileName      ：  hdfs-ods.sh
 #    CreateTime    ：  2023-03-26 01:44
 #    Author        ：  lihua shiyu
 #    Email         ：  lihuashiyu@github.com
-#    Description   ：  component.sh 被用于 ==> 将 HDFS 上的数据加载到 Hive 
+#    Description   ：  hdfs-ods.sh 被用于 ==> 将 HDFS 上的数据加载到 Hive 
 # =========================================================================================
     
     
 # 定义变量方便修改
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
+HADOOP_HOME=/opt/apache/hadoop                             # Hadoop 安装路径
+HIVE_HOME=/opt/apache/hive                                 # Hive 安装路径
 HIVE_DATA_BASE=warehouse                                   # Hive 的数据库名称
 WARE_HOUSE_DIR=/warehouse                                  # 原始文件在在 HDFS 上的路径
 LOG_FILE="hdfs-ods-$(date +%F).log"                        # 执行日志
@@ -30,27 +31,25 @@ function load_log_data()
 {
     echo "****************************** 日志日期为 ${do_date} ******************************"
     sql="load data inpath '${WARE_HOUSE_DIR}/log/${do_date}' into table ${HIVE_DATA_BASE}.ods_log_inc partition(dt='${do_date}');"
-    hive -e "${sql}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${HIVE_HOME}/bin/hive -e "${sql}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 }
 
 # 将业务维度数据 从 HDFS 加载到 Hive
 function load_db_data()
 {
-    sql=""
     for table in $*
     do
         echo "****************************** 业务表：${table:4}，日期：${do_date} ******************************"
         
         # 判断路径是否存在
-        hadoop fs -test -e "${WARE_HOUSE_DIR}/db/${table:4}/${do_date}"
+        ${HADOOP_HOME}/bin/hadoop fs -test -e "${WARE_HOUSE_DIR}/db/${table:4}/${do_date}"
         
         # 路径存在方可装载数据
         if [[ $? = 0 ]]; then
-            sql="${sql} load data inpath '${WARE_HOUSE_DIR}/db/${table:4}/${do_date}' overwrite into table ${HIVE_DATA_BASE}.${table} partition(dt='${do_date}');"
+            sql="load data inpath '${WARE_HOUSE_DIR}/db/${table:4}/${do_date}' overwrite into table ${HIVE_DATA_BASE}.${table} partition(dt='${do_date}');"
+            ${HIVE_HOME}/bin/hive -e "${sql}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
         fi
-    done
-    
-    hive -e "${sql}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 
+    done  
 }
 
 
@@ -210,7 +209,7 @@ case $1 in
     
     *)
         echo "    脚本可传入两个参数，使用方法：/path/$(basename $0) arg1 [arg2] ：                                     "
-        echo "        arg1：服务选项，必填，如下表所示；arg2：日期（yyyy-mm-dd），可选，默认昨天 "
+        echo "        arg1：表名，必填，如下表所示；arg2：日期（yyyy-mm-dd），可选，默认昨天 "
         echo "        +-------------------------------+--------------------------------+ "
         echo "        |            参   数            |            描   述             | "
         echo "        +-------------------------------+--------------------------------+ "
