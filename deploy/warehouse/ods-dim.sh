@@ -13,7 +13,7 @@
 SERVICE_DIR=$(cd "$(dirname "$0")" || exit; pwd)           # 服务位置
 HIVE_HOME=/opt/apache/hive                                 # Hive 的安装位置
 HIVE_DATA_BASE=warehouse                                   # Hive 的数据库名称
-LOG_FILE="ods-dim-$(date +%F).log"                    # 执行日志
+LOG_FILE="ods-dim-$(date +%F).log"                         # 执行日志
 
 
 # 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天
