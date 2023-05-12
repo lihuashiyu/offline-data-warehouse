@@ -195,14 +195,14 @@ from
            expire_time
     from ods_coupon_info_full
     where dt = '2021-08-15'
-) as ci left join 
+) as coupon_info left join 
 ( 
     select dic_code, 
            dic_name
     from ods_base_dic_full
     where dt = '2021-08-15' and parent_code = '32'
 ) as coupon_dic 
-    on ci.coupon_type = coupon_dic.dic_code 
+    on coupon_info.coupon_type = coupon_dic.dic_code 
 left join 
 (
     select dic_code, 
@@ -210,7 +210,7 @@ left join
     from ods_base_dic_full
     where dt = '2021-08-15' and parent_code = '33'
 ) as range_dic 
-    on ci.range_type = range_dic.dic_code;
+    on coupon_info.range_type = range_dic.dic_code;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -240,25 +240,25 @@ create external table  if not exists dim_activity_full
 
 -- 数据装载
 insert overwrite table dim_activity_full partition (dt = '2021-08-15')
-select rule.id,
-       info.id,
-       activity_name,
-       rule.activity_type,
-       dic.dic_name,
-       activity_desc,
-       start_time,
-       end_time,
-       create_time,
-       condition_amount,
-       condition_num,
-       benefit_amount,
-       benefit_discount,
+select rule.id                 as activity_rule_id,
+       info.id                 as activity_id,
+       info.activity_name,
+       rule.activity_type      as activity_type_code,
+       dic.dic_name            as activity_type_name,
+       info.activity_desc,
+       info.start_time,
+       info.end_time,
+       info.create_time,
+       rule.condition_amount,
+       rule.condition_num,
+       rule.benefit_amount,
+       rule.benefit_discount,
        case rule.activity_type
-           when '3101' then concat('满', condition_amount,           '元减', benefit_amount,              '元')
-           when '3102' then concat('满', condition_num,              '件打', 10 * (1 - benefit_discount), '折')
-           when '3103' then concat('打', 10 * (1 - benefit_discount), '折')
+           when '3101' then concat('满', rule.condition_amount,           '元减', rule.benefit_amount,              '元')
+           when '3102' then concat('满', rule.condition_num,              '件打', 10 * (1 - rule.benefit_discount), '折')
+           when '3103' then concat('打', 10 * (1 - rule.benefit_discount), '折')
        end benefit_rule,
-       benefit_level
+       rule.benefit_level
 from 
 (
     select id,
@@ -273,7 +273,8 @@ from
     where dt = '2021-08-15'
 ) rule left join 
 (
-    select id, activity_name, 
+    select id, 
+           activity_name, 
            activity_type, 
            activity_desc, 
            start_time,
@@ -310,12 +311,12 @@ create external table  if not exists dim_province_full
 -- 数据装载
 insert overwrite table dim_province_full partition (dt = '2021-08-15')
 select province.id,
-       province.name,
+       province.name        as province_name,
        province.area_code,
        province.iso_code,
        province.iso_3166_2,
-       region_id,
-       region_name
+       province.region_id,
+       region.region_name
 from 
 (
     select id, 
@@ -377,7 +378,8 @@ select * from tmp_dim_date_info;
 
 -- 将数据文件上传到 HFDS 上临时表路径：/warehouse/tmp/tmp_dim_date_info
 -- 执行以下语句将其导入时间维度表
-insert overwrite table dim_date select * from tmp_dim_date_info;
+insert overwrite table dim_date (date_id, week_id, week_day, day, month, quarter, year, is_workday, holiday_id) 
+select date_id, week_id, week_day, day, month, quarter, year, is_workday, holiday_id from tmp_dim_date_info;
 
 -- 检查数据是否导入成功
 select * from dim_date;
@@ -502,42 +504,42 @@ with tmp as
 	               row_number() over (partition by data.id order by ts desc) as rn
 		    from ods_user_info_inc
 		    where dt = '2021-08-15'
-	   ) as t1 where rn = 1
+	   ) as user_info where rn = 1
     ) as new on old.id = new.id
 )
 insert overwrite table dim_user_zip partition(dt)
-select if(new_id is not null, new_id,           old_id),
-       if(new_id is not null, new_login_name,   old_login_name),
-       if(new_id is not null, new_nick_name,    old_nick_name),
-       if(new_id is not null, new_name,         old_name),
-       if(new_id is not null, new_phone_num,    old_phone_num),
-       if(new_id is not null, new_email,        old_email),
-       if(new_id is not null, new_user_level,   old_user_level),
-       if(new_id is not null, new_birthday,     old_birthday),
-       if(new_id is not null, new_gender,       old_gender),
-       if(new_id is not null, new_create_time,  old_create_time),
-       if(new_id is not null, new_operate_time, old_operate_time),
-       if(new_id is not null, new_start_date,   old_start_date),
-       if(new_id is not null, new_end_date,     old_end_date),
-       if(new_id is not null, new_end_date,     old_end_date) dt
+select if(tmp.new_id is not null, tmp.new_id,           tmp.old_id)           as id,
+       if(tmp.new_id is not null, tmp.new_login_name,   tmp.old_login_name)   as login_name,
+       if(tmp.new_id is not null, tmp.new_nick_name,    tmp.old_nick_name)    as nick_name,
+       if(tmp.new_id is not null, tmp.new_name,         tmp.old_name)         as name,
+       if(tmp.new_id is not null, tmp.new_phone_num,    tmp.old_phone_num)    as phone_num,
+       if(tmp.new_id is not null, tmp.new_email,        tmp.old_email)        as email,
+       if(tmp.new_id is not null, tmp.new_user_level,   tmp.old_user_level)   as user_level,
+       if(tmp.new_id is not null, tmp.new_birthday,     tmp.old_birthday)     as birthday,
+       if(tmp.new_id is not null, tmp.new_gender,       tmp.old_gender)       as gender,
+       if(tmp.new_id is not null, tmp.new_create_time,  tmp.old_create_time)  as create_time,
+       if(tmp.new_id is not null, tmp.new_operate_time, tmp.old_operate_time) as operate_time,
+       if(tmp.new_id is not null, tmp.new_start_date,   tmp.old_start_date)   as start_date,
+       if(tmp.new_id is not null, tmp.new_end_date,     tmp.old_end_date)     as end_date,
+       if(tmp.new_id is not null, tmp.new_end_date,     tmp.old_end_date)     as dt
 from tmp 
 union all
-select old_id,
-       old_login_name,
-       old_nick_name,
-       old_name,
-       old_phone_num,
-       old_email,
-       old_user_level,
-       old_birthday,
-       old_gender,
-       old_create_time,
-       old_operate_time,
-       old_start_date,
-       cast(date_add('2021-08-15', -1) as string) as old_end_date,
+select tmp.old_id                                 as id,
+       tmp.old_login_name                         as login_name,
+       tmp.old_nick_name                          as nick_name,
+       tmp.old_name                               as name,
+       tmp.old_phone_num                          as phone_num,
+       tmp.old_email                              as email,
+       tmp.old_user_level                         as user_level,
+       tmp.old_birthday                           as birthday,
+       tmp.old_gender                             as gender,
+       tmp.old_create_time                        as create_time,
+       tmp.old_operate_time                       as operate_time,
+       tmp.old_start_date                         as start_date,
+       cast(date_add('2021-08-15', -1) as string) as end_date,
        cast(date_add('2021-08-15', -1) as string) as dt
 from tmp
-where old_id is not null and new_id is not null;
+where tmp.old_id is not null and tmp.new_id is not null;
 
 
 -- DIM 层首日装载脚本：ods-dim-init.sh all 2021-08-15
