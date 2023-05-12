@@ -9,11 +9,12 @@
 # =========================================================================================
 
 
-HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机
+#HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机
 TARGET_PATH=$(pwd)/                                        # 目标路径
 USER=$(whoami)                                             # 获取当前登录用户
 
 # 1. 判断输入的参数个数，以及是文件夹还是文件
+echo ""
 if [ "$#" -gt 1 ]; then
     echo "    脚本只可以收传入一个参数，为文件或文件夹路径 ......"
     exit
