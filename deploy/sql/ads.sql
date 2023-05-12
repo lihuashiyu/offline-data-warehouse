@@ -1,36 +1,43 @@
 -- -------------------------------------------------------------------------------------------------
 -- 各渠道流量统计
+--  统计周期      统计粒度    指标                         说明
+-- 最近 1/7/30 日   渠道     访客数              统计访问人数尚硅谷大数据项目之电商数仓（电商数据仓库系统）
+-- 最近 1/7/30 日   渠道     会话平均停留时长    统计每个会话平均停留时长
+-- 最近 1/7/30 日   渠道     会话平均浏览页面数  统计每个会话平均浏览页面数
+-- 最近 1/7/30 日   渠道     会话总数            统计会话总数
+-- 最近 1/7/30 日   渠道     跳出率              只有一个页面的会话的比例
 -- -------------------------------------------------------------------------------------------------
 drop table if exists ads_traffic_stats_by_channel;
 create external table if not exists ads_traffic_stats_by_channel
 (
     dt               string         comment '统计日期',
-    recent_days      bigint         comment '最近天数,1:最近1天,7:最近7天,30:最近30天',
+    recent_days      bigint         comment '最近天数：1、最近 1 天，7、最近 7 天，30、最近 30 天',
     channel          string         comment '渠道',
     uv_count         bigint         comment '访客人数',
     avg_duration_sec bigint         comment '会话平均停留时长，单位为秒',
     avg_page_count   bigint         comment '会话平均浏览页面数',
     sv_count         bigint         comment '会话数',
     bounce_rate      decimal(16, 2) comment '跳出率'
-) comment '各渠道流量统计' row format delimited fields terminated by '\t' 
+) comment '各渠道流量统计' 
+    row format delimited fields terminated by '\t' 
     location '/warehouse/ads/ads_traffic_stats_by_channel/';
 
 -- 装载数据
 insert overwrite table ads_traffic_stats_by_channel
-    select *
-    from ads_traffic_stats_by_channel
-    union
-    select '2021-08-15'                                                        dt,
-           recent_days,
-           channel,
-           cast(count(distinct (mid_id)) as bigint)                            uv_count,
-           cast(avg(during_time_1d) / 1000 as bigint)                          avg_duration_sec,
-           cast(avg(page_count_1d) as bigint)                                  avg_page_count,
-           cast(count(*) as bigint)                                            sv_count,
-           cast(sum(if(page_count_1d = 1, 1, 0)) / count(*) as decimal(16, 2)) bounce_rate
-    from dws_traffic_session_page_view_1d lateral view explode(array(1, 7, 30)) tmp as recent_days
-    where dt >= date_add('2021-08-15', -recent_days + 1)
-    group by recent_days, channel;
+select dt, recent_days, channel, uv_count, avg_duration_sec, avg_page_count, sv_count, bounce_rate 
+from ads_traffic_stats_by_channel as traffic_stats
+union
+select '2021-08-15'                                                        as dt,
+       recent_days,
+       channel,
+       cast(count(distinct (mid_id)) as bigint)                            as uv_count,
+       cast(avg(during_time_1d) / 1000 as bigint)                          as avg_duration_sec,
+       cast(avg(page_count_1d) as bigint)                                  as avg_page_count,
+       cast(count(*) as bigint)                                            as sv_count,
+       cast(sum(if(page_count_1d = 1, 1, 0)) / count(*) as decimal(16, 2)) as bounce_rate
+from dws_traffic_session_page_view_1d lateral view explode(array(1, 7, 30)) tmp as recent_days
+where dt >= date_add('2021-08-15', -recent_days + 1)
+group by recent_days, channel;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -49,25 +56,30 @@ create external table if not exists ads_page_path
 
 -- 装载数据
 insert overwrite table ads_page_path
-select *
-    from ads_page_path
+select dt, recent_days, source, target, path_count
+from ads_page_path as page_path
 union
-select '2021-08-15' dt, recent_days, source, nvl(target, 'null'), count(*) path_count
+select '2021-08-15' dt, 
+       recent_days, 
+       source, 
+       nvl(target, 'null') as target, 
+       count(*)            as path_count
+from 
+(
+    select recent_days, 
+           concat('step-', rn, ':', page_id)          source, 
+           concat('step-', rn + 1, ':', next_page_id) target
     from 
     (
-        select recent_days, 
-               concat('step-', rn, ':', page_id)          source, 
-               concat('step-', rn + 1, ':', next_page_id) target
-        from 
-        (
-            select recent_days,
-                   page_id,
-                   lead(page_id, 1, null) over (partition by session_id,recent_days)          next_page_id,
-                   row_number() over (partition by session_id,recent_days order by view_time) rn
-            from dwd_traffic_page_view_inc lateral view explode(array(1, 7, 30)) tmp as recent_days
-            where dt >= date_add('2021-08-15', -recent_days + 1)
-        ) t1
-    ) t2 group by recent_days, source, target;
+        select recent_days,
+               page_id,
+               lead(page_id, 1, null) over (partition by session_id, recent_days)                    as next_page_id,
+               row_number()           over (partition by session_id, recent_days order by view_time) as rn
+        from dwd_traffic_page_view_inc lateral view explode(array(1, 7, 30)) tmp as recent_days
+        where dt >= date_add('2021-08-15', -recent_days + 1)
+    ) as page
+) as page_view group by recent_days, source, target;
+
 
 -- -------------------------------------------------------------------------------------------------
 -- 用户变动统计
@@ -77,41 +89,45 @@ create external table if not exists ads_user_change
 (
     dt string               comment '统计日期', 
     user_churn_count bigint comment '流失用户数(新增)', 
-    user_back_count bigint  comment '回流用户数'
-) comment '用户变动统计' row format delimited fields terminated by '\t' 
+    user_back_count  bigint comment '回流用户数'
+) comment '用户变动统计' 
+    row format delimited fields terminated by '\t' 
     location '/warehouse/ads/ads_user_change/';
 
 -- 装载数据
 insert overwrite table ads_user_change
-    select * from ads_user_change
-    union
-    select churn.dt, 
-           user_churn_count, 
-           user_back_count
+select dt, user_churn_count, user_back_count
+from ads_user_change as user_change
+union
+select user_login.dt, 
+       user_churn_count, 
+       user_back_count
+from 
+(
+    select '2021-08-15' as dt, 
+           count(*)     as user_churn_count
+    from dws_user_user_login_td 
+    where dt = '2021-08-15' and login_date_last = date_add('2021-08-15', -7)
+) as user_login join 
+(
+    select '2021-08-15' as dt, 
+           count(*)     as user_back_count
     from 
     (
-        select '2021-08-15' dt, 
-               count(*)     user_churn_count
-        from dws_user_user_login_td 
-        where dt = '2021-08-15' and login_date_last = date_add('2021-08-15', -7)
-    ) churn join 
+        select user_id, 
+               login_date_last
+        from dws_user_user_login_td
+        where dt = '2021-08-15' and login_date_last = '2021-08-15'         --今日活跃的用户
+    ) as login_1 join 
     (
-        select '2021-08-15' dt, 
-               count(*)     user_back_count
-        from 
-        (
-            select user_id, login_date_last
-            from dws_user_user_login_td
-            where dt = '2021-08-15' and login_date_last = '2021-08-15'         --今日活跃的用户
-        ) t1 join 
-        (
-            select user_id, 
-                   login_date_last login_date_previous
-            from dws_user_user_login_td
-            where dt = date_add('2021-08-15', -1)                              --找出今日活跃用户的上次活跃日期
-        ) t2 on t1.user_id = t2.user_id
-              where datediff(login_date_last, login_date_previous) >= 8
-    ) back on churn.dt = back.dt;
+        select user_id, 
+               login_date_last as login_date_previous
+        from dws_user_user_login_td
+        where dt = date_add('2021-08-15', -1)                              --找出今日活跃用户的上次活跃日期
+    ) as login_2 on login_1.user_id = login_2.user_id
+    where datediff(login_date_last, login_date_previous) >= 8
+) as back on user_login.dt = back.dt;
+
 
 -- -------------------------------------------------------------------------------------------------
 -- 用户留存率
@@ -125,34 +141,37 @@ create external table if not exists ads_user_retention
     retention_count bigint         comment '留存用户数量',
     new_user_count  bigint         comment '新增用户数量',
     retention_rate  decimal(16, 2) comment '留存率'
-) comment '用户留存率' row format delimited fields terminated by '\t' 
+) comment '用户留存率' 
+    row format delimited fields terminated by '\t' 
     location '/warehouse/ads/ads_user_retention/';
 
 -- 装载数据
 insert overwrite table ads_user_retention
-    select * from ads_user_retention
-    union
-        select '2021-08-15'                                                                           dt,
-               login_date_first                                                                       create_date,
-               datediff('2021-08-15', login_date_first)                                               retention_day,
-               sum(if(login_date_last = '2021-08-15', 1, 0))                                          retention_count,
-               count(*)                                                                               new_user_count,
-               cast(sum(if(login_date_last = '2021-08-15', 1, 0)) / count(*) * 100 as decimal(16, 2)) retention_rate
-        from 
-        (
-            select user_id, 
-                   date_id login_date_first
-            from dwd_user_register_inc
-            where dt >= date_add('2021-08-15', -7) and dt < '2021-08-15'
-        ) t1 join 
-        (
-            select user_id, login_date_last 
-            from dws_user_user_login_td 
-            where dt = '2021-08-15'
-       ) t2 on t1.user_id = t2.user_id
-             group by login_date_first;
+select dt, create_date, retention_day, retention_count, new_user_count, retention_rate
+from ads_user_retention as user_retention
+union
+select '2021-08-15'                                                                                 as dt,
+       register.login_date_first                                                                    as create_date,
+       datediff('2021-08-15', register.login_date_first)                                            as retention_day,
+       sum(if(login.login_date_last = '2021-08-15', 1, 0))                                          as retention_count,
+       count(*)                                                                                     as new_user_count,
+       cast(sum(if(login.login_date_last = '2021-08-15', 1, 0)) / count(*) * 100 as decimal(16, 2)) as retention_rate
+from 
+(
+    select user_id, 
+           date_id  as login_date_first
+    from dwd_user_register_inc
+    where dt >= date_add('2021-08-15', -7) and dt < '2021-08-15'
+) as register join 
+(
+    select user_id, 
+           login_date_last 
+    from dws_user_user_login_td 
+    where dt = '2021-08-15'
+) as login on register.user_id = login.user_id
+group by register.login_date_first;
 
-
+666666666666666
 -- -------------------------------------------------------------------------------------------------
 -- 用户新增活跃统计
 -- -------------------------------------------------------------------------------------------------
@@ -163,32 +182,34 @@ create external table if not exists ads_user_stats
     recent_days       bigint comment '最近n日,1:最近1日,7:最近7日,30:最近30日',
     new_user_count    bigint comment '新增用户数',
     active_user_count bigint comment '活跃用户数'
-) comment '用户新增活跃统计' row format delimited fields terminated by '\t' 
+) comment '用户新增活跃统计' 
+    row format delimited fields terminated by '\t' 
     location '/warehouse/ads/ads_user_stats/';
 
 -- 装载数据
 insert overwrite table ads_user_stats
-    select * from ads_user_stats
-    union
-    select '2021-08-15'      dt, 
-           t1.recent_days, 
-           new_user_count, 
-           active_user_count
-    from 
-    (
-        select recent_days, 
-               count(*) new_user_count
-        from dwd_user_register_inc lateral view explode(array(1, 7, 30)) tmp as recent_days
-        where dt >= date_add('2021-08-15', -recent_days + 1)
-        group by recent_days
-    ) t1 join 
-    (
-        select recent_days, 
-               count(*)    active_user_count
-        from dws_user_user_login_td lateral view explode(array(1, 7, 30)) tmp as recent_days
-        where dt = '2021-08-15' and login_date_last >= date_add('2021-08-15', -recent_days + 1)
-        group by recent_days
-   ) t2 on t1.recent_days = t2.recent_days;
+select dt, recent_days, new_user_count, active_user_count
+from ads_user_stats as stats
+union
+select '2021-08-15'             as dt, 
+       register.recent_days,
+       register.new_user_count,
+       login.active_user_count
+from 
+(
+    select recent_days, 
+           count(*)     as new_user_count
+    from dwd_user_register_inc lateral view explode(array(1, 7, 30)) tmp as recent_days
+    where dt >= date_add('2021-08-15', - recent_days + 1)
+    group by recent_days
+) as register join 
+(
+    select recent_days, 
+           count(*)    as active_user_count
+    from dws_user_user_login_td lateral view explode(array(1, 7, 30)) tmp as recent_days
+    where dt = '2021-08-15' and login_date_last >= date_add('2021-08-15', - recent_days + 1)
+    group by recent_days
+) as login on register.recent_days = login.recent_days;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -209,91 +230,100 @@ create external table if not exists ads_user_action
 
 -- 装载数据
 insert overwrite table ads_user_action
-select * from ads_user_action
+select dt, recent_days, home_count, good_detail_count, cart_count, order_count, payment_count
+from ads_user_action as action
 union
-    select '2021-08-15'       dt, 
-           page.recent_days, 
-           home_count, 
-           good_detail_count, 
-           cart_count, 
-           order_count, 
-           payment_count
+select '2021-08-15'       dt, 
+       page.recent_days,
+       page.home_count,
+       page.good_detail_count, 
+       cart.cart_count,
+       user_order.order_count,
+       pay.payment_count
+from 
+(
+    select 1                                      as recent_days,
+           sum(if(page_id = 'home',        1, 0)) as home_count,
+           sum(if(page_id = 'good_detail', 1, 0)) as good_detail_count
+    from dws_traffic_page_visitor_page_view_1d
+    where dt = '2021-08-15' and page_id in ('home', 'good_detail')
+    union all
+    select visitor_view.recent_days,
+           sum(if(visitor_view.page_id = 'home'        and visitor_view.view_count > 0, 1, 0)) as home_count,
+           sum(if(visitor_view.page_id = 'good_detail' and visitor_view.view_count > 0, 1, 0)) as good_detail_count
     from 
     (
-        select 1                                      recent_days,
-               sum(if(page_id = 'home', 1, 0))        home_count,
-               sum(if(page_id = 'good_detail', 1, 0)) good_detail_count
-        from dws_traffic_page_visitor_page_view_1d
-        where dt = '2021-08-15' and page_id in ('home', 'good_detail')
-        union all
         select recent_days,
-               sum(if(page_id = 'home' and view_count > 0, 1, 0)),
-               sum(if(page_id = 'good_detail' and view_count > 0, 1, 0))
-        from 
-        (
-            select recent_days,
-                   page_id,
-                   case recent_days when 7 then view_count_7d when 30 then view_count_30d end view_count
-            from dws_traffic_page_visitor_page_view_nd lateral view explode(array(7, 30)) tmp as recent_days
-            where dt = '2021-08-15' and page_id in ('home', 'good_detail')
-        ) t1 group by recent_days
-   ) page join 
+               page_id,
+               case recent_days 
+                   when 7 then  view_count_7d 
+                   when 30 then view_count_30d 
+                end             view_count
+        from dws_traffic_page_visitor_page_view_nd lateral view explode(array(7, 30)) tmp as recent_days
+        where dt = '2021-08-15' and page_id in ('home', 'good_detail')
+    ) as visitor_view group by recent_days
+) as page join 
+(
+    select 1        as recent_days, 
+           count(*) as cart_count
+    from dws_trade_user_cart_add_1d
+    where dt = '2021-08-15'
+    union all
+    select user_cart.recent_days, 
+           sum(if(user_cart.cart_count > 0, 1, 0)) as cart_count
+    from 
     (
-        select 1 recent_days, count(*) cart_count
-        from dws_trade_user_cart_add_1d
+        select recent_days,
+               case recent_days
+                   when 7  then cart_add_count_7d
+                   when 30 then cart_add_count_30d
+               end              cart_count
+        from dws_trade_user_cart_add_nd lateral view explode(array(7, 30)) tmp as recent_days
         where dt = '2021-08-15'
-        union all
-        select recent_days, 
-               sum(if(cart_count > 0, 1, 0))
-        from 
-        (
-            select recent_days,
-                   case recent_days
-                       when 7  then cart_add_count_7d
-                       when 30 then cart_add_count_30d
-                   end cart_count
-            from dws_trade_user_cart_add_nd lateral view explode(array(7, 30)) tmp as recent_days
-            where dt = '2021-08-15'
-        ) t1 group by recent_days
-    ) cart on page.recent_days = cart.recent_days join 
+    ) as user_cart group by recent_days
+) as cart 
+    on page.recent_days = cart.recent_days
+          join 
+(
+    select 1        as recent_days, 
+           count(*) as order_count
+    from dws_trade_user_order_1d
+    where dt = '2021-08-15'
+    union all
+    select trade_user_order.recent_days, 
+           sum(if(trade_user_order.order_count > 0, 1, 0)) as order_count
+    from 
     (
-        select 1        recent_days, 
-               count(*) order_count
-        from dws_trade_user_order_1d
+        select recent_days,
+               case recent_days 
+                   when 7 then order_count_7d 
+                   when 30 then order_count_30d 
+               end order_count
+        from dws_trade_user_order_nd lateral view explode(array(7, 30)) tmp as recent_days
         where dt = '2021-08-15'
-        union all
-        select recent_days, 
-               sum(if(order_count > 0, 1, 0))
-        from 
-        (
-            select recent_days,
-                   case recent_days 
-                       when 7 then order_count_7d 
-                       when 30 then order_count_30d 
-                   end order_count
-            from dws_trade_user_order_nd lateral view explode(array(7, 30)) tmp as recent_days
-            where dt = '2021-08-15'
-        ) t1 group by recent_days
-    ) ord on page.recent_days = ord.recent_days join 
+    ) as trade_user_order group by recent_days
+) as user_order 
+    on page.recent_days = user_order.recent_days 
+join 
+(
+    select 1         as recent_days, 
+           count(*)  as payment_count
+    from dws_trade_user_payment_1d
+    where dt = '2021-08-15'
+    union all
+    select user_payment.recent_days, 
+           sum(if(user_payment.order_count > 0, 1, 0)) as payment_count
+    from 
     (
-        select 1 recent_days, 
-               count(*)      payment_count
-        from dws_trade_user_payment_1d
+        select recent_days,
+               case recent_days
+                   when 7  then payment_count_7d
+                   when 30 then payment_count_30d
+               end order_count
+        from dws_trade_user_payment_nd lateral view explode(array(7, 30)) tmp as recent_days
         where dt = '2021-08-15'
-        union all
-        select recent_days, 
-               sum(if(order_count > 0, 1, 0))
-        from 
-        (
-            select recent_days,
-                   case recent_days
-                       when 7  then payment_count_7d
-                       when 30 then payment_count_30d
-                   end order_count
-            from dws_trade_user_payment_nd lateral view explode(array(7, 30)) tmp as recent_days
-            where dt = '2021-08-15'
-        ) t1 group by recent_days
-    ) pay on page.recent_days = pay.recent_days;
+    ) as user_payment group by recent_days
+) as pay on page.recent_days = pay.recent_days;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -311,27 +341,28 @@ create external table if not exists ads_new_buyer_stats
 
 -- 装载数据
 insert overwrite table ads_new_buyer_stats
-    select * from ads_new_buyer_stats
-    union
-    select '2021-08-15', 
-           odr.recent_days, 
-           new_order_user_count, 
-           new_payment_user_count
-    from 
-    (
-        select recent_days,
-               sum(if(order_date_first >= date_add('2021-08-15', -recent_days + 1), 1, 0)) new_order_user_count
-        from dws_trade_user_order_td lateral view explode(array(1, 7, 30)) tmp as recent_days
-        where dt = '2021-08-15'
-        group by recent_days
-    ) odr join 
-    (
-        select recent_days,
-               sum(if(payment_date_first >= date_add('2021-08-15', -recent_days + 1), 1, 0)) new_payment_user_count
-	    from dws_trade_user_payment_td lateral view explode(array(1, 7, 30)) tmp as recent_days
-	    where dt = '2021-08-15'
-	    group by recent_days
-    ) pay on odr.recent_days = pay.recent_days;
+select dt, recent_days, new_order_user_count, new_payment_user_count 
+from ads_new_buyer_stats as buyer_stats
+union
+select '2021-08-15'           as dt, 
+       user_order.recent_days,
+       user_order.new_order_user_count, 
+       pay.new_payment_user_count
+from 
+(
+    select recent_days,
+           sum(if(order_date_first >= date_add('2021-08-15', -recent_days + 1), 1, 0)) as new_order_user_count
+    from dws_trade_user_order_td lateral view explode(array(1, 7, 30)) tmp as recent_days
+    where dt = '2021-08-15'
+    group by recent_days
+) as user_order join 
+(
+    select recent_days,
+           sum(if(payment_date_first >= date_add('2021-08-15', -recent_days + 1), 1, 0)) as new_payment_user_count
+    from dws_trade_user_payment_td lateral view explode(array(1, 7, 30)) tmp as recent_days
+    where dt = '2021-08-15'
+    group by recent_days
+) pay on user_order.recent_days = pay.recent_days;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -349,35 +380,34 @@ create external table if not exists ads_repeat_purchase_by_tm
 
 -- 装载数据
 insert overwrite table ads_repeat_purchase_by_tm
-    select * from ads_repeat_purchase_by_tm
-    union
-    select '2021-08-15'                                                           as dt,
-           recent_days,
-           tm_id,
-           tm_name,
-           cast(sum(if(order_count >= 2, 1, 0)) / sum(if(order_count >= 1, 1, 0)) as decimal(16, 2))
+select dt, recent_days, tm_id, tm_name, order_repeat_rate
+from ads_repeat_purchase_by_tm as repeat_purchase
+union
+select '2021-08-15'                                                                  as dt,
+       sku.recent_days,
+       sku.tm_id,
+       sku.tm_name,
+       cast(sum(if(sku.order_count >= 2, 1, 0)) / sum(if(sku.order_count >= 1, 1, 0)) as decimal(16, 2))
+from 
+(
+    select user_sku_order.recent_days, 
+           user_sku_order.tm_id, 
+           user_sku_order.tm_name, 
+           sum(user_sku_order.order_count) as order_count
     from 
     (
-        select '2021-08-15'     dt, 
-               recent_days, 
-               user_id, 
-               tm_id, 
-               tm_name, 
-               sum(order_count) order_count
-        from 
-        (
-            select recent_days,
-                   user_id,
-                   tm_id,
-                   tm_name,
-                   case recent_days 
-                       when 7 then order_count_7d 
-                       when 30 then order_count_30d 
-                   end order_count
-	        from dws_trade_user_sku_order_nd lateral view explode(array(7, 30)) tmp as recent_days
-	        where dt = '2021-08-15'
-        ) t1 group by recent_days, user_id, tm_id, tm_name
-    ) t2 group by recent_days, tm_id, tm_name;
+        select recent_days,
+               user_id,
+               tm_id,
+               tm_name,
+               case recent_days 
+                   when 7  then order_count_7d 
+                   when 30 then order_count_30d 
+               end              order_count
+        from dws_trade_user_sku_order_nd lateral view explode(array(7, 30)) tmp as recent_days
+        where dt = '2021-08-15'
+    ) as user_sku_order group by recent_days, user_id, tm_id, tm_name
+) as sku group by recent_days, tm_id, tm_name;
 
 
 -- -------------------------------------------------------------------------------------------------
