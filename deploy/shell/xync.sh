@@ -9,7 +9,7 @@
 # =========================================================================================
 
 
-#HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机
+HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机
 TARGET_PATH=$(pwd)/                                        # 目标路径
 USER=$(whoami)                                             # 获取当前登录用户
 
@@ -34,7 +34,7 @@ fi
 # 2. 遍历循环读取主机 ${HOST_LIST[@]}
 for host_name in "${HOST_LIST[@]}"
 do
-    printf "\n=================================== 向主机（${host_name}）同步数据 ===================================\n"    
+    printf "\n=================================== 向主机（%s）同步数据 ===================================\n" "${host_name}"    
     # rsync -rvl --delete  "${TARGET_PATH}"  "${USER}@${host_name}:${TARGET_PATH}"
     
     # 执行同步
