@@ -152,29 +152,29 @@ create external table  if not exists dim_coupon_full
 
 -- 数据装载
 insert overwrite table dim_coupon_full partition (dt = '2021-08-15')
-select id,
-       coupon_name,
-       coupon_type,
-       coupon_dic.dic_name,
-       condition_amount,
-       condition_num,
-       activity_id,
-       benefit_amount,
-       benefit_discount,
+select coupon_info.id,
+       coupon_info.coupon_name,
+       coupon_info.coupon_type          as coupon_type_code,
+       coupon_dic.dic_name              as coupon_type_name,
+       coupon_info.condition_amount,
+       coupon_info.condition_num,
+       coupon_info.activity_id,
+       coupon_info.benefit_amount,
+       coupon_info.benefit_discount,
        case coupon_type
-           when '3201' then concat('满', condition_amount, '元减', benefit_amount,              '元')
-           when '3202' then concat('满', condition_num,    '件打', 10 * (1 - benefit_discount), '折')
-           when '3203' then concat('减', benefit_amount,   '元')
-       end benefit_rule,
-       create_time,
-       range_type,
-       range_dic.dic_name,
-       limit_num,
-       taken_count,
-       start_time,
-       end_time,
-       operate_time,
-       expire_time
+           when '3201' then concat('满', coupon_info.condition_amount, '元减', coupon_info.benefit_amount,              '元')
+           when '3202' then concat('满', coupon_info.condition_num,    '件打', 10 * (1 - coupon_info.benefit_discount), '折')
+           when '3203' then concat('减', coupon_info.benefit_amount,   '元')
+       end                                 benefit_rule,
+       coupon_info.create_time,
+       coupon_info.range_type           as range_type_code,
+       range_dic.dic_name               as range_type_name,
+       coupon_info.limit_num,
+       coupon_info.taken_count,
+       coupon_info.start_time,
+       coupon_info.end_time,
+       coupon_info.operate_time,
+       coupon_info.expire_time
 from 
 (
     select id,
@@ -257,7 +257,7 @@ select rule.id                 as activity_rule_id,
            when '3101' then concat('满', rule.condition_amount,           '元减', rule.benefit_amount,              '元')
            when '3102' then concat('满', rule.condition_num,              '件打', 10 * (1 - rule.benefit_discount), '折')
            when '3103' then concat('打', 10 * (1 - rule.benefit_discount), '折')
-       end benefit_rule,
+       end                        benefit_rule,
        rule.benefit_level
 from 
 (
@@ -413,9 +413,9 @@ insert overwrite table dim_user_zip partition (dt = '9999-12-31')
 select data.id,
        data.login_name,
        data.nick_name,
-       md5(data.name),
-       md5(data.phone_num),
-       md5(data.email),
+       md5(data.name)       as name,
+       md5(data.phone_num)  as phone_num,
+       md5(data.email)      as email,
        data.user_level,
        data.birthday,
        data.gender,
@@ -424,7 +424,6 @@ select data.id,
        '2021-08-15'         as start_date,
        '9999-12-31'         as end_date
 from ods_user_info_inc
--- where dt = '2021-08-15' and type = 'insert';
 where dt = '2021-08-15' and type = 'bootstrap-insert';
 
 -- 每日装载
