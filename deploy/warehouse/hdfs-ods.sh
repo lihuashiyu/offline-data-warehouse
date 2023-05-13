@@ -48,6 +48,8 @@ function load_db_data()
         if [[ $? = 0 ]]; then
             sql="load data inpath '${WARE_HOUSE_DIR}/db/${table:4}/${do_date}' overwrite into table ${HIVE_DATA_BASE}.${table} partition(dt='${do_date}');"
             ${HIVE_HOME}/bin/hive -e "${sql}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+        else
+            echo "路径不存在：hdfs:9000//${WARE_HOUSE_DIR}/db/${table:4}/${do_date}"
         fi
     done  
 }
