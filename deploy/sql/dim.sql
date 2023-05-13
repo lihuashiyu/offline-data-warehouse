@@ -31,8 +31,9 @@ create external table  if not exists dim_sku_full
                                       attr_name: string,      value_name: string>>           comment '平台属性',
     sku_sale_attr_values array<struct<sale_attr_id: string,   sale_attr_value_id: string, 
                                       sale_attr_name: string, sale_attr_value_name: string>> comment '销售属性',
-    create_time          string comment '创建时间'
-) comment '商品维度表' partitioned by (dt string) 
+    create_time          string                                                              comment '创建时间'
+) comment '商品维度表' 
+    partitioned by (dt string) 
     stored as orc location '/warehouse/dim/dim_sku_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -136,7 +137,7 @@ create external table  if not exists dim_coupon_full
     activity_id      string         comment '活动编号',
     benefit_amount   decimal(16, 2) comment '减金额',
     benefit_discount decimal(16, 2) comment '折扣',
-    benefit_rule     string         comment '优惠规则:满元*减*元，满*件打*折',
+    benefit_rule     string         comment '优惠规则:满元 * 减 * 元，满 * 件打 * 折',
     create_time      string         comment '创建时间',
     range_type_code  string         comment '优惠范围类型编码',
     range_type_name  string         comment '优惠范围类型名称',
@@ -146,7 +147,8 @@ create external table  if not exists dim_coupon_full
     end_time         string         comment '可以领取的结束日期',
     operate_time     string         comment '修改时间',
     expire_time      string         comment '过期时间'
-) comment '优惠券维度表' partitioned by (dt string) 
+) comment '优惠券维度表' 
+    partitioned by (dt string) 
     stored as orc location '/warehouse/dim/dim_coupon_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -165,7 +167,7 @@ select coupon_info.id,
            when '3201' then concat('满', coupon_info.condition_amount, '元减', coupon_info.benefit_amount,              '元')
            when '3202' then concat('满', coupon_info.condition_num,    '件打', 10 * (1 - coupon_info.benefit_discount), '折')
            when '3203' then concat('减', coupon_info.benefit_amount,   '元')
-       end                                 benefit_rule,
+       end                              as benefit_rule,
        coupon_info.create_time,
        coupon_info.range_type           as range_type_code,
        range_dic.dic_name               as range_type_name,
@@ -219,8 +221,8 @@ left join
 drop table if exists dim_activity_full;
 create external table  if not exists dim_activity_full
 (
-    activity_rule_id   string         comment '活动规则ID',
-    activity_id        string         comment '活动ID',
+    activity_rule_id   string         comment '活动规则 ID',
+    activity_id        string         comment '活动 ID',
     activity_name      string         comment '活动名称',
     activity_type_code string         comment '活动类型编码',
     activity_type_name string         comment '活动类型名称',
@@ -234,7 +236,8 @@ create external table  if not exists dim_activity_full
     benefit_discount   decimal(16, 2) comment '优惠折扣',
     benefit_rule       string         comment '优惠规则',
     benefit_level      string         comment '优惠级别'
-) comment '活动信息表' partitioned by (dt string) 
+) comment '活动信息表' 
+    partitioned by (dt string) 
     stored as orc location '/warehouse/dim/dim_activity_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -257,7 +260,7 @@ select rule.id                 as activity_rule_id,
            when '3101' then concat('满', rule.condition_amount,           '元减', rule.benefit_amount,              '元')
            when '3102' then concat('满', rule.condition_num,              '件打', 10 * (1 - rule.benefit_discount), '折')
            when '3103' then concat('打', 10 * (1 - rule.benefit_discount), '折')
-       end                        benefit_rule,
+       end                     as benefit_rule,
        rule.benefit_level
 from 
 (
@@ -271,7 +274,7 @@ from
            benefit_level
     from ods_activity_rule_full
     where dt = '2021-08-15'
-) rule left join 
+) as rule left join 
 (
     select id, 
            activity_name, 
@@ -282,13 +285,13 @@ from
            create_time
     from ods_activity_info_full
     where dt = '2021-08-15'
-) info on rule.activity_id = info.id left join 
+) as info on rule.activity_id = info.id left join 
 (
     select dic_code, 
            dic_name
     from ods_base_dic_full
     where dt = '2021-08-15' and parent_code = '31'
-) dic on rule.activity_type = dic.dic_code;
+) as dic on rule.activity_type = dic.dic_code;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -297,14 +300,15 @@ from
 drop table if exists dim_province_full;
 create external table  if not exists dim_province_full
 (
-    id            string comment 'id',
+    id            string comment 'ID',
     province_name string comment '省市名称',
     area_code     string comment '地区编码',
     iso_code      string comment '旧版 ISO-3166-2 编码，供可视化使用',
     iso_3166_2    string comment '新版 IOS-3166-2 编码，供可视化使用',
     region_id     string comment '地区 ID',
     region_name   string comment '地区名称'
-) comment '地区维度表' partitioned by (dt string) 
+) comment '地区维度表' 
+    partitioned by (dt string) 
     stored as orc location '/warehouse/dim/dim_province_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -391,7 +395,7 @@ select * from dim_date;
 drop table if exists dim_user_zip;
 create external table  if not exists dim_user_zip
 (
-    id           string comment '用户id',
+    id           string comment '用户 ID',
     login_name   string comment '用户名称',
     nick_name    string comment '用户昵称',
     name         string comment '用户姓名',
@@ -404,7 +408,8 @@ create external table  if not exists dim_user_zip
     operate_time string comment '操作时间',
     start_date   string comment '开始日期',
     end_date     string comment '结束日期'
-) comment '用户表' partitioned by (dt string) 
+) comment '用户表' 
+    partitioned by (dt string) 
     stored as orc location '/warehouse/dim/dim_user_zip/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -503,7 +508,7 @@ with tmp as
 	               row_number() over (partition by data.id order by ts desc) as rn
 		    from ods_user_info_inc
 		    where dt = '2021-08-15'
-	   ) as user_info where rn = 1
+	   ) as user_info where user_info.rn = 1
     ) as new on old.id = new.id
 )
 insert overwrite table dim_user_zip partition(dt)
