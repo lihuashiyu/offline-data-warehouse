@@ -34,7 +34,8 @@ create external table  if not exists dim_sku_full
     create_time          string                                                              comment '创建时间'
 ) comment '商品维度表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dim/dim_sku_full/' 
+    stored as orc 
+    location '/warehouse/dim/dim_sku_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -149,7 +150,8 @@ create external table  if not exists dim_coupon_full
     expire_time      string         comment '过期时间'
 ) comment '优惠券维度表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dim/dim_coupon_full/' 
+    stored as orc 
+    location '/warehouse/dim/dim_coupon_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -238,7 +240,8 @@ create external table  if not exists dim_activity_full
     benefit_level      string         comment '优惠级别'
 ) comment '活动信息表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dim/dim_activity_full/' 
+    stored as orc 
+    location '/warehouse/dim/dim_activity_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -309,7 +312,8 @@ create external table  if not exists dim_province_full
     region_name   string comment '地区名称'
 ) comment '地区维度表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dim/dim_province_full/' 
+    stored as orc 
+    location '/warehouse/dim/dim_province_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -357,7 +361,8 @@ create external table  if not exists dim_date
     is_workday string comment '是否是工作日',
     holiday_id string comment '节假日'
 ) comment '时间维度表' 
-    stored as orc location '/warehouse/dim/dim_date/' 
+    stored as orc 
+    location '/warehouse/dim/dim_date/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载：通常情况下，时间维度表的数据并不是来自于业务系统，而是手动写入，
@@ -376,6 +381,7 @@ create external table  if not exists tmp_dim_date_info
     is_workday string comment '是否是工作日',
     holiday_id string comment '节假日'
 ) comment '时间维度表' row format delimited fields terminated by '\t' 
+    
     location '/warehouse/tmp/tmp_dim_date_info/';
 
 select * from tmp_dim_date_info;
@@ -410,7 +416,8 @@ create external table  if not exists dim_user_zip
     end_date     string comment '结束日期'
 ) comment '用户表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dim/dim_user_zip/' 
+    stored as orc 
+    location '/warehouse/dim/dim_user_zip/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载

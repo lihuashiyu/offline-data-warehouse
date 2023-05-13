@@ -31,7 +31,8 @@ create external table if not exists dws_trade_user_sku_order_1d
     order_total_amount_1d     decimal(16, 2) comment '最近 1 日下单最终金额'
 ) comment '交易域用户商品粒度订单最近 1 日汇总事实表' 
     partitioned by (dt string)
-    stored as orc location '/warehouse/dws/dws_trade_user_sku_order_1d'
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_sku_order_1d'
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -156,7 +157,8 @@ create external table if not exists dws_trade_user_sku_order_refund_1d
     order_refund_amount_1d decimal(16, 2) comment '最近 1 日退单金额'
 ) comment '交易域用户商品粒度退单最近 1 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_sku_order_refund_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_sku_order_refund_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -262,7 +264,8 @@ create external table if not exists dws_trade_user_order_1d
     order_total_amount_1d     decimal(16, 2) comment '最近 1 日下单最终金额'
 ) comment '交易域用户粒度订单最近 1 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_order_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_order_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -303,7 +306,8 @@ create external table if not exists dws_trade_user_cart_add_1d
     cart_add_num_1d   bigint comment '最近 1 日加购商品件数'
 ) comment '交易域用户粒度加购最近 1 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_cart_add_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_cart_add_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -337,7 +341,8 @@ create external table if not exists dws_trade_user_payment_1d
     payment_amount_1d decimal(16, 2) comment '最近 1 日支付金额'
 ) comment '交易域用户粒度支付最近 1 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_payment_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_payment_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -373,7 +378,8 @@ create external table if not exists dws_trade_user_order_refund_1d
     order_refund_amount_1d decimal(16, 2) comment '最近 1 日退单金额'
 ) comment '交易域用户粒度退单最近 1 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_order_refund_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_order_refund_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -416,7 +422,8 @@ create external table if not exists dws_trade_province_order_1d
     order_total_amount_1d     decimal(16, 2) comment '最近 1 日下单最终金额'
 ) comment '交易域省份粒度订单最近 1 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_province_order_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_province_order_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -508,7 +515,8 @@ create external table if not exists dws_traffic_session_page_view_1d
     page_count_1d  bigint comment '最近 1 日访问页面数'
 ) comment '流量域会话粒度页面浏览最近 1 日汇总表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_traffic_session_page_view_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_traffic_session_page_view_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -542,7 +550,8 @@ create external table if not exists dws_traffic_page_visitor_page_view_1d
     view_count_1d  bigint comment '最近 1 日访问次数'
 ) comment '流量域访客页面粒度页面浏览最近 1 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_traffic_page_visitor_page_view_1d' 
+    stored as orc 
+    location '/warehouse/dws/dws_traffic_page_visitor_page_view_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -596,7 +605,8 @@ create external table if not exists dws_trade_user_sku_order_nd
     order_total_amount_30d     decimal(16, 2) comment '最近 30 日下单最终金额'
 ) comment '交易域用户商品粒度订单最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_sku_order_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_sku_order_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -655,7 +665,8 @@ create external table if not exists dws_trade_user_sku_order_refund_nd
     order_refund_amount_30d decimal(16, 2) comment '最近 30 日退单金额'
 ) comment '交易域用户商品粒度退单最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_sku_order_refund_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_sku_order_refund_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -704,7 +715,8 @@ create external table if not exists dws_trade_user_order_nd
     order_total_amount_30d     decimal(16, 2) comment '最近 30 日下单最终金额'
 ) comment '交易域用户粒度订单最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_order_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_order_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
@@ -740,7 +752,8 @@ create external table if not exists dws_trade_user_cart_add_nd
     cart_add_num_30d   bigint comment '最近 30 日加购商品件数'
 ) comment '交易域用户粒度加购最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_cart_add_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_cart_add_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
@@ -770,7 +783,8 @@ create external table if not exists dws_trade_user_payment_nd
     payment_amount_30d decimal(16, 2) comment '最近 30 日支付金额'
 ) comment '交易域用户粒度支付最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_payment_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_payment_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
@@ -802,18 +816,19 @@ create external table if not exists dws_trade_user_order_refund_nd
     order_refund_amount_30d decimal(16, 2) comment '最近 30 日退单金额'
 ) comment '交易域用户粒度退单最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_order_refund_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_order_refund_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
 insert overwrite table dws_trade_user_order_refund_nd partition (dt = '2021-08-15')
-    select user_id,
-           sum(if(dt >= date_add('2021-08-15', -6), order_refund_count_1d,  0)) as order_refund_count_7d,
-           sum(if(dt >= date_add('2021-08-15', -6), order_refund_num_1d,    0)) as order_refund_num_7d,
-           sum(if(dt >= date_add('2021-08-15', -6), order_refund_amount_1d, 0)) as order_refund_amount_7d,
-           sum(order_refund_count_1d)                                           as order_refund_count_30d,
-           sum(order_refund_num_1d)                                             as order_refund_num_30d,
-           sum(order_refund_amount_1d)                                          as order_refund_amount_30d
+select user_id,
+       sum(if(dt >= date_add('2021-08-15', -6), order_refund_count_1d,  0)) as order_refund_count_7d,
+       sum(if(dt >= date_add('2021-08-15', -6), order_refund_num_1d,    0)) as order_refund_num_7d,
+       sum(if(dt >= date_add('2021-08-15', -6), order_refund_amount_1d, 0)) as order_refund_amount_7d,
+       sum(order_refund_count_1d)                                           as order_refund_count_30d,
+       sum(order_refund_num_1d)                                             as order_refund_num_30d,
+       sum(order_refund_amount_1d)                                          as order_refund_amount_30d
 from dws_trade_user_order_refund_1d
 where dt >= date_add('2021-08-15', -29) and dt <= '2021-08-15'
 group by user_id;
@@ -842,7 +857,8 @@ create external table if not exists dws_trade_province_order_nd
     order_total_amount_30d     decimal(16, 2) comment '最近 30 日下单最终金额'
 ) comment '交易域省份粒度订单最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_province_order_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_province_order_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
@@ -883,7 +899,8 @@ create external table if not exists dws_trade_coupon_order_nd
     coupon_reduce_amount_30d decimal(16, 2) comment '使用下单优惠金额'
 ) comment '交易域优惠券粒度订单最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_coupon_order_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_coupon_order_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
@@ -935,7 +952,8 @@ create external table if not exists dws_trade_activity_order_nd
     activity_reduce_amount_30d decimal(16, 2) comment '参与活动订单优惠金额'
 ) comment '交易域活动粒度订单最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_activity_order_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_activity_order_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
@@ -987,7 +1005,8 @@ create external table if not exists dws_traffic_page_visitor_page_view_nd
     view_count_30d  bigint comment '最近 30 日访问次数'
 ) comment '流量域访客页面粒度页面浏览最近 N 日汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_traffic_page_visitor_page_view_nd' 
+    stored as orc 
+    location '/warehouse/dws/dws_traffic_page_visitor_page_view_nd' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 装载数据
@@ -1028,7 +1047,8 @@ create external table if not exists dws_trade_user_order_td
     total_amount_td           decimal(16, 2) comment '历史至今最终金额'
 ) comment '交易域用户粒度订单历史至今汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_order_td' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_order_td' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -1097,7 +1117,8 @@ create external table if not exists dws_trade_user_payment_td
     payment_amount_td  decimal(16, 2) comment '历史至今支付金额'
 ) comment '交易域用户粒度支付历史至今汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_trade_user_payment_td' 
+    stored as orc 
+    location '/warehouse/dws/dws_trade_user_payment_td' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载
@@ -1150,7 +1171,8 @@ create external table if not exists dws_user_user_login_td
     login_count_td  bigint comment '累计登录次数'
 ) comment '用户域用户粒度登录历史至今汇总事实表' 
     partitioned by (dt string) 
-    stored as orc location '/warehouse/dws/dws_user_user_login_td' 
+    stored as orc 
+    location '/warehouse/dws/dws_user_user_login_td' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日装载

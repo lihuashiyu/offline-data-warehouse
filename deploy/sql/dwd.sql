@@ -19,8 +19,10 @@ create external table if not exists dwd_trade_cart_add_inc
     source_type_code string comment '来源类型编码',
     source_type_name string comment '来源类型名称',
     sku_num          bigint comment '加购物车件数'
-) comment '交易域加购物车事务事实表' partitioned by (`dt` string)
-    row format delimited fields terminated by '\t' stored as orc
+) comment '交易域加购物车事务事实表' 
+    partitioned by (`dt` string)
+    row format delimited fields terminated by '\t' 
+    stored as orc
     location '/warehouse/dwd/dwd_trade_cart_add_inc/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -113,8 +115,10 @@ create external table if not exists dwd_trade_order_detail_inc
     split_activity_amount decimal(16, 2) comment '活动优惠分摊',
     split_coupon_amount   decimal(16, 2) comment '优惠券优惠分摊',
     split_total_amount    decimal(16, 2) comment '最终价格分摊'
-) comment '交易域下单明细事务事实表' partitioned by (dt string) 
-    row format delimited fields terminated by '\t' stored as orc 
+) comment '交易域下单明细事务事实表' 
+    partitioned by (dt string) 
+    row format delimited fields terminated by '\t' 
+    stored as orc 
     location '/warehouse/dwd/dwd_trade_order_detail_inc/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -284,8 +288,10 @@ create external table if not exists dwd_trade_cancel_detail_inc
     split_activity_amount decimal(16, 2) comment '活动优惠分摊',
     split_coupon_amount   decimal(16, 2) comment '优惠券优惠分摊',
     split_total_amount    decimal(16, 2) comment '最终价格分摊'
-) comment '交易域取消订单明细事务事实表' partitioned by (dt string) 
-    row format delimited fields terminated by '\t' stored as orc 
+) comment '交易域取消订单明细事务事实表' 
+    partitioned by (dt string) 
+    row format delimited fields terminated by '\t' 
+    stored as orc 
     location '/warehouse/dwd/dwd_trade_cancel_detail_inc/' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -319,7 +325,7 @@ from
            data.source_id,
            data.source_type,
            data.sku_num,
-           data.sku_num * data.order_price split_original_amount,
+           data.sku_num * data.order_price as split_original_amount,
            data.split_total_amount,
            data.split_activity_amount,
            data.split_coupon_amount
@@ -457,9 +463,11 @@ create external table if not exists dwd_trade_pay_detail_suc_inc
     split_activity_amount decimal(16, 2) comment '支付活动优惠分摊',
     split_coupon_amount   decimal(16, 2) comment '支付优惠券优惠分摊',
     split_payment_amount  decimal(16, 2) comment '支付金额'
-) comment '交易域成功支付事务事实表' partitioned by (dt string) 
+) comment '交易域成功支付事务事实表' 
+    partitioned by (dt string) 
     row format delimited fields terminated by '\t' 
-    stored as orc location '/warehouse/dwd/dwd_trade_pay_detail_suc_inc/' 
+    stored as orc 
+    location '/warehouse/dwd/dwd_trade_pay_detail_suc_inc/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 首日数据装载
@@ -661,8 +669,10 @@ create external table if not exists dwd_trade_order_refund_inc
     refund_reason_txt       string         comment '退单原因描述',
     refund_num              bigint         comment '退单件数',
     refund_amount           decimal(16, 2) comment '退单金额'
-) comment '交易域退单事务事实表' partitioned by (dt string) 
-    stored as orc location '/warehouse/dwd/dwd_trade_order_refund_inc/' 
+) comment '交易域退单事务事实表' 
+    partitioned by (dt string) 
+    stored as orc 
+    location '/warehouse/dwd/dwd_trade_order_refund_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
 -- 首日数据装载
@@ -796,7 +806,8 @@ create external table if not exists dwd_trade_refund_pay_suc_inc
     refund_num        decimal(16, 2) comment '退款件数',
     refund_amount     decimal(16, 2) comment '退款金额'
 ) comment '交易域提交退款成功事务事实表' 
-    partitioned by (dt string) stored as orc 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_trade_refund_pay_suc_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
@@ -922,9 +933,11 @@ create external table if not exists dwd_trade_cart_full
     sku_id   string comment '商品 ID',
     sku_name string comment '商品名称',
     sku_num  bigint comment '购物车件数'
-) comment '交易域购物车周期快照事实表' partitioned by (dt string) 
+) comment '交易域购物车周期快照事实表' 
+    partitioned by (dt string) 
     row format delimited fields terminated by '\t' 
-    stored as orc location '/warehouse/dwd/dwd_trade_cart_full/' 
+    stored as orc 
+    location '/warehouse/dwd/dwd_trade_cart_full/' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -949,8 +962,10 @@ create external table if not exists dwd_tool_coupon_get_inc
     user_id   string comment 'USER_ ID',
     date_id   string comment '日期  ID',
     get_time  string comment '领取时间'
-) comment '优惠券领取事务事实表' partitioned by (dt string) 
-    stored as orc location '/warehouse/dwd/dwd_tool_coupon_get_inc/' 
+) comment '优惠券领取事务事实表' 
+    partitioned by (dt string) 
+    stored as orc 
+    location '/warehouse/dwd/dwd_tool_coupon_get_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
 -- 首日数据装载
@@ -987,8 +1002,10 @@ create external table if not exists dwd_tool_coupon_order_inc
     order_id   string comment '订单 ID',
     date_id    string comment '日期 ID',
     order_time string comment '使用下单时间'
-) comment '优惠券使用下单事务事实表' partitioned by (dt string) 
-    stored as orc location '/warehouse/dwd/dwd_tool_coupon_order_inc/' 
+) comment '优惠券使用下单事务事实表' 
+    partitioned by (dt string) 
+    stored as orc 
+    location '/warehouse/dwd/dwd_tool_coupon_order_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
 -- 首日数据装载
@@ -1027,8 +1044,10 @@ create external table if not exists dwd_tool_coupon_pay_inc
     order_id     string comment '订单 ID',
     date_id      string comment '日期 ID',
     payment_time string comment '使用支付时间'
-) comment '优惠券使用支付事务事实表' partitioned by (dt string) 
-    stored as orc location '/warehouse/dwd/dwd_tool_coupon_pay_inc/'
+) comment '优惠券使用支付事务事实表' 
+    partitioned by (dt string) 
+    stored as orc 
+    location '/warehouse/dwd/dwd_tool_coupon_pay_inc/'
     tblproperties ("orc.compress" = "snappy");
 
 -- 首日数据装载
@@ -1066,8 +1085,10 @@ create external table if not exists dwd_interaction_favor_add_inc
     sku_id      string comment 'sku_ ID',
     date_id     string comment '日期 ID',
     create_time string comment '收藏时间'
-) comment '收藏事实表' partitioned by (dt string) stored as orc
-	location '/warehouse/dwd/dwd_interaction_favor_add_inc/' 
+) comment '收藏事实表' 
+    partitioned by (dt string) 
+    stored as orc 
+    location '/warehouse/dwd/dwd_interaction_favor_add_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
 -- 首日数据装载
@@ -1107,7 +1128,9 @@ create external table if not exists dwd_interaction_comment_inc
     create_time   string comment '评价时间',
     appraise_code string comment '评价编码',
     appraise_name string comment '评价名称'
-) comment '评价事务事实表' partitioned by (dt string) stored as orc 
+) comment '评价事务事实表' 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_interaction_comment_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
@@ -1193,8 +1216,10 @@ create external table if not exists dwd_traffic_page_view_inc
     view_time      string comment '跳入时间',
     session_id     string comment '所属会话 ID',
     during_time    bigint comment '持续时间毫秒'
-) comment '页面日志表' partitioned by (dt string) 
-    stored as orc location '/warehouse/dwd/dwd_traffic_page_view_inc' 
+) comment '页面日志表' 
+    partitioned by (dt string) 
+    stored as orc 
+    location '/warehouse/dwd/dwd_traffic_page_view_inc' 
     tblproperties ('orc.compress' = 'snappy');
 
 -- 数据装载
@@ -1270,7 +1295,9 @@ create external table if not exists dwd_traffic_start_inc
     loading_time_ms bigint comment '启动加载时间',
     open_ad_ms      bigint comment '广告总共播放时间',
     open_ad_skip_ms bigint comment '用户跳过广告时点'
-) comment '启动日志表' partitioned by (dt string) stored as orc 
+) comment '启动日志表' 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_traffic_start_inc' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -1347,7 +1374,9 @@ create external table if not exists dwd_traffic_action_inc
     action_item_type string comment '目标类型',
     date_id          string comment '日期 ID',
     action_time      string comment '动作发生时间'
-) comment '动作日志表' partitioned by (dt string) stored as orc 
+) comment '动作日志表' 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_traffic_action_inc' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -1434,7 +1463,9 @@ create external table if not exists dwd_traffic_display_inc
     display_item_type string comment '曝光对象类型',
     display_order     bigint comment '曝光顺序',
     display_pos_id    bigint comment '曝光位置'
-) comment '曝光日志表' partitioned by (dt string) stored as orc 
+) comment '曝光日志表' 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_traffic_display_inc' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -1529,7 +1560,9 @@ create external table if not exists dwd_traffic_error_inc
     error_time      string                                                                           comment '错误时间',
     error_code      string                                                                           comment '错误码',
     error_msg       string                                                                           comment '错误信息'
-) comment '错误日志表' partitioned by (dt string) stored as orc 
+) comment '错误日志表' 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_traffic_error_inc' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -1617,7 +1650,9 @@ create external table if not exists dwd_user_register_inc
     brand          string comment '设备品牌',
     model          string comment '设备型号',
     operate_system string comment '设备操作系统'
-) comment '用户域用户注册事务事实表' partitioned by (dt string) stored as orc 
+) comment '用户域用户注册事务事实表' 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_user_register_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
@@ -1720,7 +1755,9 @@ create external table if not exists dwd_user_login_inc
     brand          string comment '设备品牌',
     model          string comment '设备型号',
     operate_system string comment '设备操作系统'
-) comment '用户域用户登录事务事实表' partitioned by (dt string) stored as orc 
+) comment '用户域用户登录事务事实表' 
+    partitioned by (dt string) 
+    stored as orc 
     location '/warehouse/dwd/dwd_user_login_inc/' 
     tblproperties ("orc.compress" = "snappy");
 
