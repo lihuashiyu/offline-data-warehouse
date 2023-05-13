@@ -24,10 +24,12 @@ sleep 1
 
 # 3.打包
 echo "============================= 部署包制作中 ============================="
-rm -rf "${ROOT_DIR}/deploy/${PACKAGE_FILE}"
-cp -fpr "${ROOT_DIR}/LICENSE" "${ROOT_DIR}/deploy/" 
-mv     "${ROOT_DIR}/deploy/"  "${ROOT_DIR}/${ALIAS_NAME}"
-cd     "${ROOT_DIR}" || exit 
+rm -rf  "${ROOT_DIR}/deploy/${PACKAGE_FILE}"
+cp -fpr "${ROOT_DIR}/LICENSE"   "${ROOT_DIR}/deploy/" 
+cp -fpr "${ROOT_DIR}/README.md" "${ROOT_DIR}/deploy/ReadMe.md" 
+mv      "${ROOT_DIR}/deploy/"   "${ROOT_DIR}/${ALIAS_NAME}"
+
+cd        "${ROOT_DIR}" || exit 
 tar -zcvf "${PACKAGE_FILE}" "${ALIAS_NAME}/" >> "${ROOT_DIR}/logs/${LOG_FILE}" 2>&1 
 sleep 1
 
