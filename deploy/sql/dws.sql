@@ -29,7 +29,8 @@ create external table if not exists dws_trade_user_sku_order_1d
     activity_reduce_amount_1d decimal(16, 2) comment '最近 1 日活动优惠金额',
     coupon_reduce_amount_1d   decimal(16, 2) comment '最近 1 日优惠券优惠金额',
     order_total_amount_1d     decimal(16, 2) comment '最近 1 日下单最终金额'
-) comment '交易域用户商品粒度订单最近 1 日汇总事实表' partitioned by (dt string)
+) comment '交易域用户商品粒度订单最近 1 日汇总事实表' 
+    partitioned by (dt string)
     stored as orc location '/warehouse/dws/dws_trade_user_sku_order_1d'
     tblproperties ('orc.compress' = 'snappy');
 
@@ -315,7 +316,7 @@ from dwd_trade_cart_add_inc
 group by user_id, dt;
 
 -- 每日装载
-insert overwrite table dws_trade_user_cart_add_1d partition (dt = '2021-08-15')
+insert overwrite table dws_trade_user_cart_add_1d partition (dt = '2021-08-16')
 select user_id, 
        count(*)      as cart_add_count_1d, 
        sum(sku_num)  as cart_add_num_1d
@@ -350,7 +351,7 @@ from dwd_trade_pay_detail_suc_inc
 group by user_id, dt;
 
 -- 每日装载
-insert overwrite table dws_trade_user_payment_1d partition (dt = '2021-08-15')
+insert overwrite table dws_trade_user_payment_1d partition (dt = '2021-08-16')
 select user_id,
        count(distinct (order_id)) as payment_count_1d, 
        sum(sku_num)               as payment_num_1d, 
@@ -366,9 +367,9 @@ group by user_id;
 drop table if exists dws_trade_user_order_refund_1d;
 create external table if not exists dws_trade_user_order_refund_1d
 (
-    user_id                string comment '用户 ID',
-    order_refund_count_1d  bigint comment '最近 1 日退单次数',
-    order_refund_num_1d    bigint comment '最近 1 日退单商品件数',
+    user_id                string         comment '用户 ID',
+    order_refund_count_1d  bigint         comment '最近 1 日退单次数',
+    order_refund_num_1d    bigint         comment '最近 1 日退单商品件数',
     order_refund_amount_1d decimal(16, 2) comment '最近 1 日退单金额'
 ) comment '交易域用户粒度退单最近 1 日汇总事实表' 
     partitioned by (dt string) 
@@ -387,7 +388,7 @@ from dwd_trade_order_refund_inc
 group by user_id, dt;
 
 -- 每日装载
-insert overwrite table dws_trade_user_order_refund_1d partition (dt = '2021-08-15')
+insert overwrite table dws_trade_user_order_refund_1d partition (dt = '2021-08-16')
 select user_id, 
        count(*)           as order_refund_count,
        sum(refund_num)    as order_refund_num,
@@ -406,8 +407,8 @@ create external table if not exists dws_trade_province_order_1d
     province_id               string         comment '省份 ID',
     province_name             string         comment '省份名称',
     area_code                 string         comment '地区编码',
-    iso_code                  string         comment '旧版ISO-3166-2编码',
-    iso_3166_2                string         comment '新版版ISO-3166-2编码',
+    iso_code                  string         comment '旧版 ISO-3166-2 编码',
+    iso_3166_2                string         comment '新版版 ISO-3166-2 编码',
     order_count_1d            bigint         comment '最近 1 日下单次数',
     order_original_amount_1d  decimal(16, 2) comment '最近 1 日下单原始金额',
     activity_reduce_amount_1d decimal(16, 2) comment '最近 1 日下单活动优惠金额',
@@ -455,7 +456,7 @@ from
 ) as province on order_detail.province_id = province.id;
 
 -- 每日装载
-insert overwrite table dws_trade_province_order_1d partition (dt = '2021-08-15')
+insert overwrite table dws_trade_province_order_1d partition (dt = '2021-08-16')
 select province.id                             as province_id,
        province.province_name,
        province.area_code,
@@ -636,8 +637,8 @@ drop table if exists dws_trade_user_sku_order_refund_nd;
 create external table if not exists dws_trade_user_sku_order_refund_nd
 (
     user_id                 string         comment '用户 ID',
-    sku_id                  string         comment 'sku_ ID',
-    sku_name                string         comment 'sku名称',
+    sku_id                  string         comment 'SKU ID',
+    sku_name                string         comment 'SKU 名称',
     category1_id            string         comment '一级分类 ID',
     category1_name          string         comment '一级分类名称',
     category2_id            string         comment '一级分类 ID',
@@ -646,12 +647,12 @@ create external table if not exists dws_trade_user_sku_order_refund_nd
     category3_name          string         comment '一级分类名称',
     tm_id                   string         comment '品牌 ID',
     tm_name                 string         comment '品牌名称',
-    order_refund_count_7d   bigint         comment '最近7日退单次数',
-    order_refund_num_7d     bigint         comment '最近7日退单件数',
-    order_refund_amount_7d  decimal(16, 2) comment '最近7日退单金额',
-    order_refund_count_30d  bigint         comment '最近30日退单次数',
-    order_refund_num_30d    bigint         comment '最近30日退单件数',
-    order_refund_amount_30d decimal(16, 2) comment '最近30日退单金额'
+    order_refund_count_7d   bigint         comment '最近 7 日退单次数',
+    order_refund_num_7d     bigint         comment '最近 7 日退单件数',
+    order_refund_amount_7d  decimal(16, 2) comment '最近 7 日退单金额',
+    order_refund_count_30d  bigint         comment '最近 30 日退单次数',
+    order_refund_num_30d    bigint         comment '最近 30 日退单件数',
+    order_refund_amount_30d decimal(16, 2) comment '最近 30 日退单金额'
 ) comment '交易域用户商品粒度退单最近 N 日汇总事实表' 
     partitioned by (dt string) 
     stored as orc location '/warehouse/dws/dws_trade_user_sku_order_refund_nd' 
@@ -733,10 +734,10 @@ drop table if exists dws_trade_user_cart_add_nd;
 create external table if not exists dws_trade_user_cart_add_nd
 (
     user_id            string comment '用户 ID',
-    cart_add_count_7d  bigint comment '最近7日加购次数',
-    cart_add_num_7d    bigint comment '最近7日加购商品件数',
-    cart_add_count_30d bigint comment '最近30日加购次数',
-    cart_add_num_30d   bigint comment '最近30日加购商品件数'
+    cart_add_count_7d  bigint comment '最近 7 日加购次数',
+    cart_add_num_7d    bigint comment '最近 7 日加购商品件数',
+    cart_add_count_30d bigint comment '最近 30 日加购次数',
+    cart_add_num_30d   bigint comment '最近 30 日加购商品件数'
 ) comment '交易域用户粒度加购最近 N 日汇总事实表' 
     partitioned by (dt string) 
     stored as orc location '/warehouse/dws/dws_trade_user_cart_add_nd' 
@@ -761,12 +762,12 @@ drop table if exists dws_trade_user_payment_nd;
 create external table if not exists dws_trade_user_payment_nd
 (
     user_id            string         comment '用户 ID',
-    payment_count_7d   bigint         comment '最近7日支付次数',
-    payment_num_7d     bigint         comment '最近7日支付商品件数',
-    payment_amount_7d  decimal(16, 2) comment '最近7日支付金额',
-    payment_count_30d  bigint         comment '最近30日支付次数',
-    payment_num_30d    bigint         comment '最近30日支付商品件数',
-    payment_amount_30d decimal(16, 2) comment '最近30日支付金额'
+    payment_count_7d   bigint         comment '最近 7 日支付次数',
+    payment_num_7d     bigint         comment '最近 7 日支付商品件数',
+    payment_amount_7d  decimal(16, 2) comment '最近 7 日支付金额',
+    payment_count_30d  bigint         comment '最近 30 日支付次数',
+    payment_num_30d    bigint         comment '最近 30 日支付商品件数',
+    payment_amount_30d decimal(16, 2) comment '最近 30 日支付金额'
 ) comment '交易域用户粒度支付最近 N 日汇总事实表' 
     partitioned by (dt string) 
     stored as orc location '/warehouse/dws/dws_trade_user_payment_nd' 
@@ -792,13 +793,13 @@ group by user_id;
 drop table if exists dws_trade_user_order_refund_nd;
 create external table if not exists dws_trade_user_order_refund_nd
 (
-    user_id                 string comment '用户 ID',
-    order_refund_count_7d   bigint comment '最近7日退单次数',
-    order_refund_num_7d     bigint comment '最近7日退单商品件数',
-    order_refund_amount_7d  decimal(16, 2) comment '最近7日退单金额',
-    order_refund_count_30d  bigint comment '最近30日退单次数',
-    order_refund_num_30d    bigint comment '最近30日退单商品件数',
-    order_refund_amount_30d decimal(16, 2) comment '最近30日退单金额'
+    user_id                 string         comment '用户 ID',
+    order_refund_count_7d   bigint         comment '最近 7 日退单次数',
+    order_refund_num_7d     bigint         comment '最近 7 日退单商品件数',
+    order_refund_amount_7d  decimal(16, 2) comment '最近 7 日退单金额',
+    order_refund_count_30d  bigint         comment '最近 30 日退单次数',
+    order_refund_num_30d    bigint         comment '最近 30 日退单商品件数',
+    order_refund_amount_30d decimal(16, 2) comment '最近 30 日退单金额'
 ) comment '交易域用户粒度退单最近 N 日汇总事实表' 
     partitioned by (dt string) 
     stored as orc location '/warehouse/dws/dws_trade_user_order_refund_nd' 
@@ -846,21 +847,21 @@ create external table if not exists dws_trade_province_order_nd
 
 -- 装载数据
 insert overwrite table dws_trade_province_order_nd partition (dt = '2021-08-15')
-    select province_id,
-           province_name,
-           area_code,
-           iso_code,
-           iso_3166_2,
-           sum(if(dt >= date_add('2021-08-15', -6), order_count_1d,            0)) as order_count_7d,
-           sum(if(dt >= date_add('2021-08-15', -6), order_original_amount_1d,  0)) as order_original_amount_7d,
-           sum(if(dt >= date_add('2021-08-15', -6), activity_reduce_amount_1d, 0)) as activity_reduce_amount_7d,
-           sum(if(dt >= date_add('2021-08-15', -6), coupon_reduce_amount_1d,   0)) as coupon_reduce_amount_7d,
-           sum(if(dt >= date_add('2021-08-15', -6), order_total_amount_1d,     0)) as order_total_amount_7d,
-           sum(order_count_1d)                                                     as order_count_30d,
-           sum(order_original_amount_1d)                                           as order_original_amount_30d,
-           sum(activity_reduce_amount_1d)                                          as activity_reduce_amount_30,
-           sum(coupon_reduce_amount_1d)                                            as coupon_reduce_amount_30d,
-           sum(order_total_amount_1d)                                              as order_total_amount_30d
+select province_id,
+       province_name,
+       area_code,
+       iso_code,
+       iso_3166_2,
+       sum(if(dt >= date_add('2021-08-15', -6), order_count_1d,            0)) as order_count_7d,
+       sum(if(dt >= date_add('2021-08-15', -6), order_original_amount_1d,  0)) as order_original_amount_7d,
+       sum(if(dt >= date_add('2021-08-15', -6), activity_reduce_amount_1d, 0)) as activity_reduce_amount_7d,
+       sum(if(dt >= date_add('2021-08-15', -6), coupon_reduce_amount_1d,   0)) as coupon_reduce_amount_7d,
+       sum(if(dt >= date_add('2021-08-15', -6), order_total_amount_1d,     0)) as order_total_amount_7d,
+       sum(order_count_1d)                                                     as order_count_30d,
+       sum(order_original_amount_1d)                                           as order_original_amount_30d,
+       sum(activity_reduce_amount_1d)                                          as activity_reduce_amount_30,
+       sum(coupon_reduce_amount_1d)                                            as coupon_reduce_amount_30d,
+       sum(order_total_amount_1d)                                              as order_total_amount_30d
 from dws_trade_province_order_1d
 where dt >= date_add('2021-08-15', -29) and dt <= '2021-08-15'
 group by province_id, province_name, area_code, iso_code, iso_3166_2;
@@ -915,7 +916,8 @@ from
     where dt >= date_add('2021-08-15', -29) and dt <= '2021-08-15' and coupon_id is not null
 ) as order_detail 
     on coupon.id = order_detail.coupon_id
-group by id, coupon_name, coupon_type_code, coupon_type_name, benefit_rule, start_date;
+group by coupon.id,               coupon.coupon_name,  coupon.coupon_type_code,
+         coupon.coupon_type_name, coupon.benefit_rule, coupon.start_date;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -964,7 +966,8 @@ from
     from dwd_trade_order_detail_inc
     where dt >= date_add('2021-08-15', -29) and dt <= '2021-08-15' and activity_id is not null
 ) as order_detail on activity.activity_id = order_detail.activity_id
-group by activity.activity_id, activity_name, activity_type_code, activity_type_name, start_time;
+group by activity.activity_id,        activity.activity_name, activity.activity_type_code,
+         activity.activity_type_name, activity.start_time;
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -1043,7 +1046,7 @@ from dws_trade_user_order_1d
 group by user_id;
 
 -- 每日装载
-insert overwrite table dws_trade_user_order_td partition (dt = '2021-08-15')
+insert overwrite table dws_trade_user_order_td partition (dt = '2021-08-16')
 select nvl(old.user_id, new.user_id)                                                 as user_id,
        if(old.user_id is null,     '2021-08-15', old.order_date_first)               as order_date_first,
        if(new.user_id is not null, '2021-08-15', old.order_date_last)                as order_date_last,
@@ -1109,7 +1112,7 @@ from dws_trade_user_payment_1d
 group by user_id;
 
 -- 每日装载
-insert overwrite table dws_trade_user_payment_td partition (dt = '2021-08-15')
+insert overwrite table dws_trade_user_payment_td partition (dt = '2021-08-16')
 select nvl(old.user_id, new.user_id)                                     as user_id,
        if(old.user_id is null,     '2021-08-15', old.payment_date_first) as payment_date_first,
        if(new.user_id is not null, '2021-08-15', old.payment_date_last)  as payment_date_last,
@@ -1145,7 +1148,8 @@ create external table if not exists dws_user_user_login_td
     user_id         string comment '用户 ID', 
     login_date_last string comment '末次登录日期',
     login_count_td  bigint comment '累计登录次数'
-) comment '用户域用户粒度登录历史至今汇总事实表' partitioned by (dt string) 
+) comment '用户域用户粒度登录历史至今汇总事实表' 
+    partitioned by (dt string) 
     stored as orc location '/warehouse/dws/dws_user_user_login_td' 
     tblproperties ('orc.compress' = 'snappy');
 
@@ -1170,7 +1174,7 @@ from
 ) as login on user_.id = login.user_id;
 
 -- 每日装载
-insert overwrite table dws_user_user_login_td partition (dt = '2021-08-15')
+insert overwrite table dws_user_user_login_td partition (dt = '2021-08-16')
 select nvl(old.user_id, new.user_id)                              as user_id,
        if(new.user_id is null, old.login_date_last, '2021-08-15') as login_date_last,
        nvl(old.login_count_td, 0) + nvl(new.login_count_1d, 0)    as login_count_td
@@ -1181,14 +1185,14 @@ from
            login_count_td
     from dws_user_user_login_td
     where dt = date_add('2021-08-16', -1)
-) old full outer join 
+) as old full outer join 
 (
     select user_id, 
            count(*) as login_count_1d
     from dwd_user_login_inc
     where dt = '2021-08-16'
     group by user_id
-) new on old.user_id = new.user_id;
+) as new on old.user_id = new.user_id;
 
 
 -- -------------------------------------------------------------------------------------------------
