@@ -380,13 +380,15 @@ create external table  if not exists tmp_dim_date_info
     year       string comment '年',
     is_workday string comment '是否是工作日',
     holiday_id string comment '节假日'
-) comment '时间维度表' row format delimited fields terminated by '\t' 
-    
+) comment '时间维度表' 
+    row format delimited fields terminated by '\t' 
     location '/warehouse/tmp/tmp_dim_date_info/';
 
+-- 将数据文件加载到 HFDS 上临时表路径：/warehouse/tmp/tmp_dim_date_info
+-- hdfs dfs -put date_info.tsv /warehouse/tmp/tmp_dim_date_info
+load data local inpath '/project-path/warehouse/date_info.tsv' overwrite into table tmp_dim_date_info;
 select * from tmp_dim_date_info;
 
--- 将数据文件上传到 HFDS 上临时表路径：/warehouse/tmp/tmp_dim_date_info
 -- 执行以下语句将其导入时间维度表
 insert overwrite table dim_date (date_id, week_id, week_day, day, month, quarter, year, is_workday, holiday_id) 
 select date_id, week_id, week_day, day, month, quarter, year, is_workday, holiday_id from tmp_dim_date_info;

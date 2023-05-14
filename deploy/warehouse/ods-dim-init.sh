@@ -27,7 +27,10 @@ else
 fi
 
 
-dim_date="insert overwrite table ${HIVE_DATA_BASE}.dim_date select * from ${HIVE_DATA_BASE}.tmp_dim_date_info;"
+dim_date="
+    load data local inpath '${SERVICE_DIR}/date_info.tsv' overwrite into table ${HIVE_DATA_BASE}.tmp_dim_date_info;
+    insert overwrite table ${HIVE_DATA_BASE}.dim_date select * from ${HIVE_DATA_BASE}.tmp_dim_date_info;
+    "
 
 dim_user_zip="
     insert overwrite table ${HIVE_DATA_BASE}.dim_user_zip 
