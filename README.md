@@ -182,7 +182,6 @@
      ├── component.sh                                      # 各个大数据组件的启停脚本
      ├── data-sync.sh                                      # 将模拟数据同步到 hdfs 的启停脚本
      ├── init.sh                                           # 部署完成后，一键初始化
-     ├── install.sh                                        # 一键部署脚本
      ├── range.sh                                          # range 认证脚本
      ├── warehouse.sh                                      # 数仓中每层之间的计算
      ├── xcall.sh                                          # 在多台服务器执行命令，并查看结果
@@ -195,20 +194,15 @@
     # 数仓中各层之间的流转脚本，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 7 到 12 章节
     # *._init.sh 仅在数仓初始化的时候使用，用于同步历史数据
     warehouse
-     ├── dwd-dws-1d-init.sh                                # DWS 层 1 天初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.1.10 章节
-     ├── dwd-dws-1d.sh                                     # DWS 层 1 天       数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.1.10 章节
-     ├── dwd-dws-history-init.sh                           # DWS 层历史初始化  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.3.4  章节
-     ├── dwd-dws-history.sh                                # DWS 层历史        数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.3.4  章节
-     ├── dwd-dws-nd-init.sh                                # DWS 层 N 天初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.2.11 章节
-     ├── dwd-dws-nd.sh                                     # DWS 层 N 天       数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10.2.11 章节
-     ├── dws-ads-init.sh                                   # ADS 层初始化      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  11.7   章节
-     ├── dws-ads.sh                                        # ADS 层            数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  11.7   章节
-     ├── hdfs-ods-init.sh                                  # ODS 层初始化      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的   7.1   章节
-     ├── hdfs-ods.sh                                       # ODS 层            数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的   7.2   章节
-     ├── ods-dim-init.sh                                   # DIM 层初始化      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  8.7.1  章节
-     ├── ods-dim.sh                                        # DIM 层初每日      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  8.7.2  章节
-     ├── ods-dwd_init.sh                                   # DWD 层初始化      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 9.20.1  章节
-     └── ods-dwd.sh                                        # DWD 层初每日      数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 9.20.2  章节
+     ├── dwd-dws-init.sh                                   # DWS 层 初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10 章节
+     ├── dwd-dws.sh                                        # DWS 层  每日  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 10 章节
+     ├── dws-ads.sh                                        # ADS 层  每日  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  11.7   章节
+     ├── hdfs-ods-init.sh                                  # ODS 层 初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的   7.1   章节
+     ├── hdfs-ods.sh                                       # ODS 层  每日  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的   7.2   章节
+     ├── ods-dim-init.sh                                   # DIM 层 初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  8.7.1  章节
+     ├── ods-dim.sh                                        # DIM 层  每日  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的  8.7.2  章节
+     ├── ods-dwd_init.sh                                   # DWD 层 初始化 数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 9.20.1  章节
+     └── ods-dwd.sh                                        # DWD 层  每日  数据装载，详见文档 offline-data-warehouse/doc/3-电商数据仓库系统.docx 的 9.20.2  章节
 ```
 
 <br/>
