@@ -1226,19 +1226,6 @@ create external table if not exists dws_traffic_page_visitor_page_view_1d
     location '/warehouse/dws/dws_traffic_page_visitor_page_view_1d' 
     tblproperties ('orc.compress' = 'snappy');
 
--- 数据装载
-insert overwrite table dws_traffic_page_visitor_page_view_1d partition (dt = '2021-08-15')
-select mid_id, 
-       brand, 
-       model, 
-       operate_system, 
-       page_id, 
-       sum(during_time) as during_time_1d, 
-       count(*)         as view_count_1d
-from dwd_traffic_page_view_inc
-where dt = '2021-08-15'
-group by mid_id, brand, model, operate_system, page_id;
-
 -- 最近 N 日汇总表：交易域用户商品粒度订单最近 N 日汇总表
 drop table if exists dws_trade_user_sku_order_nd;
 create external table if not exists dws_trade_user_sku_order_nd
