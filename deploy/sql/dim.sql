@@ -390,8 +390,7 @@ load data local inpath '/project-path/warehouse/date_info.tsv' overwrite into ta
 select * from tmp_dim_date_info;
 
 -- 执行以下语句将其导入时间维度表
-insert overwrite table dim_date (date_id, week_id, week_day, day, month, quarter, year, is_workday, holiday_id) 
-select date_id, week_id, week_day, day, month, quarter, year, is_workday, holiday_id from tmp_dim_date_info;
+insert overwrite table dim_date select date_id, week_id, week_day, day, month, quarter, year, is_workday, holiday_id from tmp_dim_date_info;
 
 -- 检查数据是否导入成功
 select * from dim_date;
