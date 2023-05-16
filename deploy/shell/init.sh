@@ -26,8 +26,10 @@ SLAVER_LIST=(slaver1 slaver2 slaver3)                      # slaver 主机名称
 function create_model_log()
 {
     module_list=$(ls -d "${PROJECT_DIR}"/*/)
+    
     for module in ${module_list}
     do
+        echo "    在目录（${module}）中创建 日志目录 logs "
         mkdir -p "${module}/logs"
     done
 }
