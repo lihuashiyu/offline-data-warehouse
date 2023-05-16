@@ -28,10 +28,7 @@ function create_model_log()
     module_list=$(ls -d "${PROJECT_DIR}"/*/)
     for module in ${module_list}
     do
-        for host_name in "${HOST_LIST[@]}"
-        do
-            ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; mkdir -p ${module}/logs"
-        done
+        mkdir -p "${module}/logs"
     done
 }
 
@@ -162,15 +159,19 @@ function warehouse()
 }
 
 
-# 1. 将解压后的项目同步到其它节点
+# 1.创建日志存储目录
+create_model_log
+
+# 2. 将解压后的项目同步到其它节点
 "${SERVICE_DIR}"/xync.sh "${PROJECT_DIR}/"
 
-# 2. 启动大数据组件
+# 3. 启动大数据组件
 "${SERVICE_DIR}/component.sh" start 
 
-# 执行程序
-create_model_log
+# 4. 创建 Mysql 和 Hive 表
 create_table
+
+# 5. 生成并同步数据
 generate_log
 kafka_hdfs
 mysql_kafka
