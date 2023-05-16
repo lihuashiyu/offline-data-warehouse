@@ -15,11 +15,17 @@ PROJECT_DIR=$(cd "${SERVICE_DIR}/../" || exit; pwd)        # 项目根路径
 MYSQL_HOME="/opt/db/mysql"                                 # Mysql 安装路径
 HIVE_HOME="/opt/apache/hive"                               # Hive 安装路径
 
-LOG_FILE="init-$(date +%F).log"                            # 操作日志
+MYSQL_HOST="master"                                        # Mysql 安装的节点
+HIVE_HOST="master"                                         # Hive  安装的节点
+MOCK_LOG_HOST_LIST=(slaver1 slaver2 slaver3)               # 需要生成 历史 行为日志 的节点
+MOCK_DB_HOST_LIST=(slaver1 slaver2 slaver3)                # 需要生成 历史 业务数据 的节点
+DATAX_HOST_LIST=(master)                                   # 同步 数据库中的 全量数据 到 HDFS 使用的 Datax 所在的节点 
+MAXWELL_HOST_LIST=(slaver1)                                # 同步生成的数据库中的 历史增量数据 到 Kafka 使用的 MaxWell 所在的节点 
+KAFKA_LOG_HOST_LIST=(slaver2)                              # 将 Kafka 中的历史日志同步到 HDFS 的 Flume 所在的节点
+KAFKA_DB_HOST_LIST=(slaver3)                               # 将 Kafka 中的增量数据同步到 HDFS 的 Flume 所在的节点
+
 USER=$(whoami)                                             # 当前用户
-HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机名称
-MASTER_LIST=(master)                                       # master 主机名称
-SLAVER_LIST=(slaver1 slaver2 slaver3)                      # slaver 主机名称
+LOG_FILE="init-$(date +%F).log"                            # 操作日志
 
 
 # 1. 创建各个模块的日志目录
@@ -38,28 +44,35 @@ function create_model_log()
 function create_table()
 {
     # 1.创建数据库并授权
-    atguigu="    drop database if exists at_gui_gu;   create database if not exists at_gui_gu;   grant all privileges on at_gui_gu.* to 'issac'@'%';   flush privileges;"
+    atguigu="    drop database if exists at_gui_gu;   create database if not exists at_gui_gu;   grant all privileges on at_gui_gu.*   to 'issac'@'%'; flush privileges;"
     view_report="drop database if exists view_report; create database if not exists view_report; grant all privileges on view_report.* to 'issac'@'%'; flush privileges;"
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "${atguigu}"    >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uroot -p111111 -e "${view_report}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -h${MYSQL_HOST} -P3306 -uroot -p111111 -e "${atguigu}"     >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -h${MYSQL_HOST} -P3306 -uroot -p111111 -e "${view_report}" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
     # 2. 在 Mysql 中，将 mock-db 的数据导入到 数据库 at_gui_gu
     echo "****************************** 将 mock-db 的 sql 执行到数据库 ******************************"
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 -Dat_gui_gu < "${PROJECT_DIR}/mock-db/table.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 -Dat_gui_gu < "${PROJECT_DIR}/mock-db/data.sql"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-
+    ${MYSQL_HOME}/bin/mysql -h${MYSQL_HOST} -P3306 -uissac -p111111 -Dat_gui_gu < "${PROJECT_DIR}/mock-db/table.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -h${MYSQL_HOST} -P3306 -uissac -p111111 -Dat_gui_gu < "${PROJECT_DIR}/mock-db/data.sql"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    
     # 3. 在 Hive 中创建所有的 ODS、DIM、DWD、DWS、ADS 表
     echo "****************************** 在 Hive 中创建数据仓库各层的表 ******************************"
-    "${HIVE_HOME}/bin/hive" -f "${PROJECT_DIR}/sql/hive.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    "${HIVE_HOME}/bin/hive" -h ${HIVE_HOST} -p 10000 -f "${PROJECT_DIR}/sql/hive.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
     # 4. 在 Mysql 中创建所有从 Hive 中导出的表结构
     echo "****************************** 在 Mysql 中创建 ADS 层的映射表 ******************************"
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 -Dview_report < "${PROJECT_DIR}/sql/export.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    ${MYSQL_HOME}/bin/mysql -h${MYSQL_HOST} -P3306 -uissac -p111111 -Dview_report < "${PROJECT_DIR}/sql/export.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 }
 
 # 3. 模拟生成 5 天的 用户行为 历史日志
 function generate_log()
 {
+    echo "****************************** 监控行为日志并同步到 Kafka ******************************"
+    for host_name in "${MOCK_LOG_HOST_LIST[@]}"
+    do
+        echo "    ************************** ${host_name} ：${nd_date} **************************    "
+        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/file-kafka/file-kafka.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    done    
+    
     echo "****************************** 模拟生成 5 天的用户行为日志 ******************************"
     number=5
         
@@ -68,9 +81,9 @@ function generate_log()
         nd_date=$(date "+%Y-%m-%d" -d "-${number} days")
         number=$((number - 1))
         
-        for host_name in "${SLAVER_LIST[@]}"
+        for host_name in "${MOCK_LOG_HOST_LIST[@]}"
         do
-            echo "    ************************** ${host_name} ： ${nd_date} **************************    "
+            echo "    ************************** ${host_name} ：${nd_date} **************************    "
             ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mock-log/cycle.sh ${nd_date}; mv ${PROJECT_DIR}/mock-log/logs/mock-$(date +%F).log ${PROJECT_DIR}/mock-log/logs/mock-${nd_date}.log "
         done
     done
@@ -80,12 +93,16 @@ function generate_log()
 function generate_db()
 {
     echo "****************************** 模拟生成 5 天的业务数据 ******************************"
+    # 需要 初始化
+    
+    
+    # 生成数据
     number=5
     while [ "${number}" -gt 0 ]
     do
         nd_date=$(date "+%Y-%m-%d" -d "-${number} days")
         
-        for host_name in "${MASTER_LIST[@]}"
+        for host_name in "${MOCK_DB_HOST_LIST[@]}"
         do
             if [ "${number}" == "5" ]; then
                 echo "    在主机（${host_name}）初始化数据库    "
@@ -102,7 +119,7 @@ function generate_db()
 function mysql_hdfs()
 {
     echo "***************************** 将 Mysql 的 维表数据 同步到 hdfs *****************************"
-    for host_name in "${MASTER_LIST[@]}"
+    for host_name in "${DATAX_HOST_LIST[@]}"
     do
         ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-hdfs/mysql-hdfs.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     done
@@ -111,23 +128,29 @@ function mysql_hdfs()
 # 6. 将 Mysql 中的历史 实时数据 通过 maxwell 同步到 kafka
 function mysql_kafka()
 {
-    echo "***************************** 将 Mysql 的 实时数据 同步到 kafka *****************************"
+    echo "***************************** 将 maxwell 的源数据导入到 Mysql *****************************"
+    ${MYSQL_HOME}/bin/mysql -h${MYSQL_HOST} -P3306 -uissac -p111111 < "${PROJECT_DIR}/mysql-kafka/meta.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
-    ${MYSQL_HOME}/bin/mysql -hmaster -P3306 -uissac -p111111 < "${PROJECT_DIR}/mysql-kafka/meta.sql" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    
-    for host_name in "${MASTER_LIST[@]}"
+    echo "***************************** 将 Mysql 的 全量数据 同步到 kafka *****************************"
+    for host_name in "${MAXWELL_HOST_LIST[@]}"
     do
-        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-kafka/mysql-kafka-init.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    done
+        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-hdfs/mysql-hdfs.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    done    
+    ssh "${USER}@${DATAX_HOST}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/mysql-kafka/mysql-kafka-init.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
 }
 
 # 7. 将 kafka 中的 用户行为日志 和 业务实时数据 同步到 hdfs
 function kafka_hdfs()
 {
     echo "******************************* 将 kafka 的 数据 同步到 hdfs *******************************"
-    for host_name in "${MASTER_LIST[@]}"
+    for host_name in "${KAFKA_LOG_HOST_LIST[@]}"
     do
         ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-log.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    done    
+    
+    echo "******************************* 将 kafka 的 数据 同步到 hdfs *******************************"
+    for host_name in "${KAFKA_DB_HOST_LIST[@]}"
+    do
         ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; ${PROJECT_DIR}/kafka-hdfs/kafka-hdfs-db.sh start" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     done
 }
@@ -137,20 +160,23 @@ function warehouse()
 {
     # 1. HDFS ----> ODS
     echo "======================================= HDFS -----> ODS ========================================"
-    "${PROJECT_DIR}/warehouse/hdfs-ods-log.sh" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
-    "${PROJECT_DIR}/warehouse/hdfs-ods-db.sh"  >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    "${PROJECT_DIR}/warehouse/hdfs-ods.sh"     >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
     # 2. ODS ----> DWD
     echo "======================================== ODS -----> DWD ========================================"
     "${PROJECT_DIR}/warehouse/ods-dwd-init.sh" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+
+    # 3. ODS ----> DIM
+    echo "======================================== ODS -----> DIM ========================================"
+    "${PROJECT_DIR}/warehouse/ods-dim-init.sh" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
-    # 3. DWD ----> DWS
+    # 4. DWD ----> DWS
     echo "======================================== DWD ----> DWS ========================================"
     "${PROJECT_DIR}/warehouse/dwd-dws-init.sh" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
     # 4. DWS ----> ADS
     echo "======================================== DWS ----> ADS ========================================"
-    "${PROJECT_DIR}/warehouse/dws-ads-init.sh" >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    "${PROJECT_DIR}/warehouse/dws-ads.sh"      >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     
     # 5. ADS ----> Mysql
     echo "======================================= ADS ----> Mysql ======================================="
@@ -174,8 +200,8 @@ create_model_log
 create_table
 
 # 5. 生成并同步数据
-generate_log
 kafka_hdfs
+generate_log
 mysql_kafka
 generate_db
 mysql_hdfs

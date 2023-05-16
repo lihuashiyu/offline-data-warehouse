@@ -17,25 +17,28 @@ touch "${PROJECT_DIR}/logs/${LOG_FILE}"
 
 # 2. HDFS ----> ODS
 echo "======================================= HDFS -----> ODS ========================================"
-"${PROJECT_DIR}/warehouse/hdfs-ods-log.sh" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
-"${PROJECT_DIR}/warehouse/hdfs-ods-db.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+"${PROJECT_DIR}/warehouse/hdfs-ods.sh" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
 # 3. ODS ----> DWD
 echo "======================================== ODS -----> DWD ========================================"
-"${PROJECT_DIR}/warehouse/ods-dwd.sh"      >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+"${PROJECT_DIR}/warehouse/ods-dwd.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
-# 4. DWD ----> DWS
+# 4. ODS ----> DIM
+echo "======================================== ODS -----> DIM ========================================"
+"${PROJECT_DIR}/warehouse/ods-dim.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+
+# 5. DWD ----> DWS
 echo "======================================== DWD ----> DWS ========================================"
-"${PROJECT_DIR}/warehouse/dwd-dws-log.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+"${PROJECT_DIR}/warehouse/dwd-dws.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
-# 5. DWS ----> ADS
+# 6. DWS ----> ADS
 echo "======================================== DWS ----> ADS ========================================"
-"${PROJECT_DIR}/warehouse/dws-ads.sh"      >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
+"${PROJECT_DIR}/warehouse/dws-ads.sh"  >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
-# 6. ADS ----> Mysql
+# 7. ADS ----> Mysql
 echo "======================================= ADS ----> Mysql ======================================="
 "${PROJECT_DIR}/hdfs-mysql/hdfs-mysql.sh" >> "${PROJECT_DIR}/logs/${LOG_FILE}" 2>&1
 
-# 6. ADS ----> Mysql
+# 8. ADS ----> Mysql
 echo "========================================== 完成退出 ==========================================="
 exit 0
