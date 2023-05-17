@@ -93,12 +93,6 @@ function service_stop()
 
 
 printf "\n"
-# 1. 创建日志目录
-mkdir -p "${SERVICE_DIR}/logs"
-
-# 2. 创建日志文件
-touch "${SERVICE_DIR}/logs/${LOG_FILE}"
-
 #  匹配输入参数
 case "$1" in
     # 1. 运行程序
