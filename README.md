@@ -263,6 +263,7 @@
 
 ```bash
     # 1. 拉取项目，并进行构建
+    cd ~                                                                       # 进入用户家目录
     git clone https://github.com/lihuashiyu/offline-data-warehouse.git         # 使用 git 将仓库中的代码和文件克隆到本地 
     cd offline-data-warehouse/ || exit                                         # 进入项目
     ./deploy.sh                                                                # 在项目的根目录下，进行构建项目，并将部署包上传到服务器
@@ -273,10 +274,10 @@
     
     # 3. 进行集群部署以及初始化
     cd ~/offline-data-warehouse  || exit                                       # 进入部署路径
-    ~/offline-data-warehouse/shell/init.sh                                     # 执行初始化脚本，进行多台服务器部署完后初始化
+    bash ~/offline-data-warehouse/shell/init.sh                                # 执行初始化脚本，进行多台服务器部署完后初始化
     
     # 4. 一键启动，将模拟生成的 业务数据、用户行为日志，同步到 HDFS 的 /warehouse/tmp/ （注意：此脚本只适用于增量同步）
-    ~/offline-data-warehouse/shell/warer-house.sh start                        # 执行部署脚本，进行多台服务器部署
+    ~/offline-data-warehouse/shell/data-sync.sh start                          # 执行部署脚本，进行多台服务器部署
     
     # 5. 查看数据是否同步成功
     ${HADOOP_HOME}/bin/hadoop fs -ls -l /warehouse/tmp/
