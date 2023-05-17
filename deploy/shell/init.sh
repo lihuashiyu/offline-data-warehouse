@@ -213,6 +213,9 @@ function warehouse_init()
 
 
 # ============================================= 执行函数 ============================================== 
+# 0. 给所有 shell 脚本添加可执行权限
+find "${PROJECT_DIR}/" -iname "*.sh" -type f -exec chmod u+x {} + 
+
 # 1.创建日志存储目录
 create_model_log
 
