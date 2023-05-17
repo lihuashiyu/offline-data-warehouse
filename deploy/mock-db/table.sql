@@ -344,7 +344,7 @@ create table if not exists order_detail_activity
     activity_rule_id bigint(20)                            comment '活动规则',
     sku_id           bigint(20)                            comment 'skuID',
     create_time      datetime(0)                           comment '获取时间'
-) engine = InnoDB auto_increment = 1 comment = '订单明细购物券表';
+) engine = InnoDB auto_increment = 1 comment = '订单明细活动表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for order_detail_coupon
@@ -392,7 +392,7 @@ create table if not exists order_info
     feight_fee             decimal(16, 2)                        comment '运费',
     feight_fee_reduce      decimal(16, 2)                        comment '运费减免',
     refundable_time        datetime(0)                           comment '可退款日期（签收后30天）'
-) engine = InnoDB auto_increment = 1  comment = '订单表 订单表';
+) engine = InnoDB auto_increment = 1  comment = '订单表';
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for order_refund_info
@@ -423,7 +423,7 @@ create table if not exists order_status_log
     order_id     bigint(11),
     order_status varchar(11),
     operate_time datetime(0)
-) engine = InnoDB auto_increment = 1;
+) engine = InnoDB auto_increment = 1 comment = '订单状态日志记录表'; 
 
 -- -------------------------------------------------------------------------------------------------
 -- Table structure for payment_info
