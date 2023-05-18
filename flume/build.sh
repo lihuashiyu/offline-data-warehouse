@@ -10,8 +10,9 @@
 
 SERVICE_DIR=$(cd $(dirname "$0") || exit; pwd)             # 需要执行的服务路径
 ROOT_DIR=$(cd "${SERVICE_DIR}/../" || exit; pwd)           # 项目根路径
-MAVEN_HOME="${MAVEN_HOME}"                                 # Maven 安装目录
-LOG_FILE="flume-build-$(date +%F-%H-%M-%S).log"            # 操作日志存储
+MAVEN_HOME="/opt/apache/maven"                             # Maven 安装目录
+# LOG_FILE="flume-build-$(date +%F-%H-%M-%S).log"          # 操作日志存储
+LOG_FILE="flume-build-$(date +%F).log"                     # 操作日志存储
 
 # 1. 创建日志目录 logs
 mkdir -p "${ROOT_DIR}/logs/" 
