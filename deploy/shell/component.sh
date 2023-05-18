@@ -20,22 +20,17 @@ ZOOKEEPER_HOME="/opt/apache/zookeeper"                     # Zookeeper 安装路
 KAFKA_HOME="/opt/apache/kafka"                             # Kafka 安装路径
 EFAK="/opt/apache/kafka/efak"                              # EFAK 安装路径
 
-HOST_LIST=(master slaver1 slaver2 slaver3)                 # 集群主机
-USER=$(whoami)                                             # 获取当前登录用户
 LOG_FILE="component-$(date +%F).log"                       # 操作日志
 
 
 # 组件启动的 java 进程
 function service_status()
 {
-    ssh "${USER}@master" "source ~/.bashrc; source /etc/profile; ${MYSQL_HOME}/bin/mysql.sh status"
+    # 1. 查看 Mysql 运行状态
+    "${SERVICE_DIR}/xcall.sh" "\"${MYSQL_HOME}/bin/mysql.sh status\""
     
-    # 2. 遍历所有的主机，查看启动的 jvm 进程
-    for host_name in "${HOST_LIST[@]}"
-    do
-        echo "****************************** 在主机 ${host_name} 上启动的 java 进程 ******************************"
-        ssh "${USER}@${host_name}" "source ~/.bashrc; source /etc/profile; jps -l | sort -t ' ' -k 2 | grep -v sun.tools.jps.Jps "
-    done
+    # 2. 查看启动的 jvm 进程
+    "${SERVICE_DIR}/xcall.sh" "\"jps -l | sort -t ' ' -k 2 | grep -v sun.tools.jps.Jps \""
 }
 
 
