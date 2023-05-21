@@ -1341,7 +1341,7 @@ from
     where dt = '2021-08-15' and `start` is not null
 ) as log left join 
 (
-    select id province_id, 
+    select id         as province_id, 
            area_code 
     from ods_base_province_full 
     where dt = '2021-08-15'
@@ -1428,7 +1428,7 @@ from
     where dt = '2021-08-15' and actions is not null
 ) as log left join 
 (
-    select id province_id, 
+    select id        as province_id, 
            area_code 
     from ods_base_province_full 
     where dt = '2021-08-15'
@@ -1521,7 +1521,7 @@ from
     where dt = '2021-08-15' and displays is not null
 ) as log left join 
 (
-    select id province_id, 
+    select id        as province_id, 
            area_code 
     from ods_base_province_full 
     where dt = '2021-08-15'
@@ -1626,7 +1626,7 @@ from
     where dt = '2021-08-15' and err is not null
 ) as log left join 
 (
-    select id province_id, 
+    select id        as province_id, 
            area_code 
     from ods_base_province_full 
     where dt = '2021-08-15'
@@ -1692,7 +1692,7 @@ from
     on user_info.user_id = log.user_id 
 left join 
 (
-    select id province_id, 
+    select id        as province_id, 
            area_code 
     from ods_base_province_full 
     where dt = '2021-08-15'
@@ -1732,7 +1732,7 @@ from
     on user_info.user_id = log.user_id 
 left join 
 (
-    select id province_id, 
+    select id        as province_id, 
            area_code 
     from ods_base_province_full 
     where dt = '2021-08-16'
@@ -1827,7 +1827,7 @@ from
     ) as v where rn = 1
 ) as log left join 
 (
-    select id province_id, 
+    select id        as province_id, 
            area_code 
     from ods_base_province_full 
     where dt = '2021-08-15'
