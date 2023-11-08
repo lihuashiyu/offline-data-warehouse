@@ -248,6 +248,8 @@
 |                  |          |   WorkerServer    |        |   √    |   √    |   √    |                                                                |
 |      datax       |  2022.9  |       DataX       |   √    |       |         |         |            需要替换 Mysql 的驱动 jar，以支持 8.0.x             |
 
+大数据组件部署请参考：[大数据部署项目](https://github.com/lihuashiyu/bigdata-deploy/)
+
 ### 4.2 项目服务规划
 
 <center>项目服务规划</center>
