@@ -45,7 +45,7 @@ function service_status()
 function service_start()
 {
     # 1. 复制拦截器的 jar 到 flume 安装路径的 lib 目录下，并替换 拦截器名称
-    cp -fpr "${SERVICE_DIR}/${INTERCEPTOR_JAR}" ${FLUME_HOME}/lib >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
+    # cp -fpr "${SERVICE_DIR}/${INTERCEPTOR_JAR}" ${FLUME_HOME}/lib >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1
     sed -i "s#a1.sources.r1.interceptors.i1.type.*#a1.sources.r1.interceptors.i1.type = ${INTERCEPTOR_NAME}#g" "${SERVICE_DIR}/${CONF_FILE}"
     
     # 2. 替换数据源和缓存
@@ -64,10 +64,11 @@ function service_start()
         # 5.1 加载程序，启动程序
         echo "    程序（${ALIAS_NAME}）正在加载中 ......"
         
-        nohup ${FLUME_HOME}/bin/flume-ng agent -c "${FLUME_HOME}/conf" \
-                                               -n a1 \
-                                               -f "${SERVICE_DIR}/${CONF_FILE}" \
-                                               -Dflume.root.logger=${INFO_OUT_TYPE} \
+        nohup ${FLUME_HOME}/bin/flume-ng agent --conf "${FLUME_HOME}/conf"                     \
+                                               --name a1                                       \
+                                               --conf-file "${SERVICE_DIR}/${CONF_FILE}"       \
+                                               --classpath "${SERVICE_DIR}/${INTERCEPTOR_JAR}" \
+                                               -Dflume.root.logger=${INFO_OUT_TYPE}            \
                                                >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
         sleep 2
         echo "    程序（${ALIAS_NAME}）启动验证中 ...... "

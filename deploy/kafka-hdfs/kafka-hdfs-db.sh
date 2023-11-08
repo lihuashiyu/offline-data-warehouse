@@ -45,7 +45,7 @@ function service_status()
 function service_start()
 {
     # 1. 复制拦截器的 jar 并替换 拦截器名称
-    cp -fpr "${SERVICE_DIR}/${INTERCEPTOR_JAR}" ${FLUME_NG}/lib >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
+    # cp -fpr "${SERVICE_DIR}/${INTERCEPTOR_JAR}" ${FLUME_NG}/lib >> "${SERVICE_DIR}/${LOG_FILE}" 2>&1
     sed -i "s#a3.sources.r3.interceptors.i1.type.*#a3.sources.r3.interceptors.i1.type = ${INTERCEPTOR_NAME}#g" "${SERVICE_DIR}/${CONF_FILE}"
 
     # 2. 替换 Kafka 连接的 url 和 topic
@@ -67,11 +67,12 @@ function service_start()
         # 3. 加载程序，启动程序
         echo "    程序（${ALIAS_NAME}）正在加载中 ......"
         
-        nohup ${FLUME_NG}/bin/flume-ng agent -c "${FLUME_NG}/conf" \
-                                             -n a3 \
-                                             -f "${SERVICE_DIR}/${CONF_FILE}" \
-                                             -Dflume.root.logger=${INFO_OUT_TYPE} \
-                                             >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &
+        nohup ${FLUME_NG}/bin/flume-ng agent --conf "${FLUME_NG}/conf"                       \
+                                             --name a3                                       \
+                                             --conf-file "${SERVICE_DIR}/${CONF_FILE}"       \
+                                             --classpath "${SERVICE_DIR}/${INTERCEPTOR_JAR}" \
+                                             -Dflume.root.logger=${INFO_OUT_TYPE}            \
+                                             >> "${SERVICE_DIR}/logs/${LOG_FILE}" 2>&1 &                                             
         sleep 2
         echo "    程序（${ALIAS_NAME}）启动验证中 ...... "
         sleep 3
