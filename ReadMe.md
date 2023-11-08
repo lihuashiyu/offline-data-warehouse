@@ -20,7 +20,7 @@
      ├── deploy.sh                                         # 一键打包脚本
      ├── doc                                               # 尚硅谷相关文档
      ├── flume                                             # 自定义 flume 拦截器源码，用于拦截不规则的数据
-     └── README.md                                         # 项目说明文档                                                                
+     └── ReadMe.md                                         # 项目说明文档                                                                
 ```
 
 <br/>
@@ -182,7 +182,7 @@
      ├── component.sh                                      # 各个大数据组件的启停脚本
      ├── data-sync.sh                                      # 将模拟数据同步到 hdfs 的启停脚本
      ├── init.sh                                           # 部署完成后，一键初始化
-     ├── range.sh                                          # range 认证脚本
+     ├── range.sh                                          # range 认证脚本：暂时不需要
      ├── warehouse.sh                                      # 数仓中每层之间的计算
      ├── xcall.sh                                          # 在多台服务器执行命令，并查看结果
      └── xync.sh                                           # 文件同步脚本 
@@ -224,38 +224,44 @@
 
 <br/>
 
-**<center>集群服务器规划</center>**
+**<center>组件规划</center>**
 
-|     服务名称     | 版本号 |      子服务       | master | slaver1 | slaver2 | slaver3 |                              说明                              |
-|:----------------:|:------:|:-----------------:|:------:|:-------:|:-------:|:-------:|:--------------------------------------------------------------:|
-|                  |        |      NameNode     |   √   |         |         |         |                                                                |
-|                  | 3.2.4  | SecondaryNameNode |   √   |         |         |         |                                                                |
-|      hadoop      |        |     DataNode      |        |   √    |   √    |   √    |                                                                |
-|                  |        |  ResourceManager  |   √   |         |         |         |                                                                |
-|                  |        |    NodeManager    |        |   √    |   √    |   √    |                                                                |
-|      spark       | 3.2.3  |   Spark on Yarn   |   √   |   √    |   √    |   √    |          需要编译源码，解决与 hadoop-3.2.4 的兼容问题          |
-|      hbase       | 2.4.16 |      HMaster      |   √   |         |         |         |                                                                |
-|                  |        |   HRegionServer   |        |   √    |   √    |   √    |                                                                |
-|       hive       | 3.1.3  |   Hive on Spark   |   √   |         |         |         |  需要编译源码，解决与 hadoop-3.2.4 和 Spark-3.2.3 的兼容问题   |
-|    zookeeper     | 3.6.4  |     Zookeeper     |        |   √    |   √    |   √    |                                                                |
-|      kafka       | 3.2.3  |       Kafka       |        |   √    |   √    |   √    |                                                                |
-|      mysql       | 8.0.28 |       Mysql       |   √   |         |         |         |                                                                |
-|      flume       | 1.11.0 |       Flume       |   √   |   √    |   √    |   √    |               master 消费 Kafka，slaver 采集日志               |
-|     maxwell      | 1.29.2 |      Maxwell      |        |   √    |   √    |   √    |                           同步 Mysql                           |
-| DolphinScheduler | 3.1.3  |   MasterServer    |        |   √    |         |         |                                                                |
-|                  |        |   WorkerServer    |        |         |   √    |   √    |                                                                |
-|      datax       | 2022.9 |       DataX       |   √   |         |         |         |            需要替换 Mysql 的驱动 jar，以支持 8.0.x             |
-|      presto      |        |    Coordinator    |        |   √    |         |         |                                                                |
-|                  |        |      Worker       |        |         |   √    |   √    |                                                                |
-|      druid       |        |       Druid       |        |   √    |   √    |   √    |                                                                |
-|      kylin       |        |       Kylin       |   √   |         |         |         |                                                                |
-|     Superset     |        |     Superset      |   √   |         |         |         |                                                                |
-|      atlas       |        |       Atlas       |   √   |         |         |         |                                                                |
-|      solr        |        |        solr       |        |   √    |   √    |   √    |                                                                |
+|     组件名称     |  版本号  |      子服务       | master | slaver1 | slaver2 | slaver3 |                              说明                              |
+|:----------------:|:--------:|:-----------------:|:------:|:-------:|:-------:|:-------:|:--------------------------------------------------------------:|
+|       java       | 1.8.321  |       Java        |   √   |   √    |   √    |   √    |                                                                |
+|      scala       | 2.12.17  |       Scala       |   √   |   √    |   √    |   √    |                                                                |
+|      mysql       |  8.0.28  |       Mysql       |   √   |         |         |         |                                                                |
+|                  |          |      NameNode     |   √   |         |         |         |                                                                |
+|                  |  3.2.4   | SecondaryNameNode |   √   |         |         |         |                                                                |
+|      hadoop      |          |     DataNode      |   √   |   √     |   √    |   √    |                                                                |
+|                  |          |  ResourceManager  |   √   |         |         |         |                                                                |
+|                  |          |    NodeManager    |        |   √    |   √    |   √    |                                                                |
+|      spark       |  3.2.3   |   Spark on Yarn   |   √   |   √    |   √    |   √    |          需要编译源码，解决与 hadoop-3.2.4 的兼容问题          |
+|      hbase       |  2.4.16  |      HMaster      |   √   |         |         |         |                                                                |
+|                  |          |   HRegionServer   |        |   √    |   √    |   √    |                                                                |
+|       hive       |  3.1.3   |   Hive on Spark   |   √   |         |         |         |  需要编译源码，解决与 hadoop-3.2.4 和 Spark-3.2.4 的兼容问题   |
+|    zookeeper     |  3.6.4   |     Zookeeper     |        |   √    |   √    |   √    |                                                                |
+|      kafka       |  3.2.3   |       Kafka       |        |   √    |   √    |   √    |                                                                |
+|      flume       |  1.11.0  |       Flume       |        |   √    |   √    |   √    |               master 消费 Kafka，slaver 采集日志               |
+|     maxwell      |  1.29.2  |      Maxwell      |        |   √    |   √    |   √    |                           同步 Mysql                           |
+| DolphinScheduler |  3.1.3   |   MasterServer    |   √   |   √    |         |         |                                                                |
+|                  |          |   WorkerServer    |        |   √    |   √    |   √    |                                                                |
+|      datax       |  2022.9  |       DataX       |   √    |       |         |         |            需要替换 Mysql 的驱动 jar，以支持 8.0.x             |
 
-### 4.2 组件的安装
+### 4.2 项目服务规划
 
-  **详见** offline-data-warehouse/doc/0-各组件的安装.md
+<center>项目服务规划</center>
+
+|     服务名称     | 版本号  | master | slaver1 | slaver2 | slaver3 |            说明            |
+|:----------------:|:------:|:------:|:-------:|:-------:|:-------:|:--------------------------:|
+|     mock-log     |  1.0   |        |   √    |   √    |   √    |         生成用户日志         |
+|    file-kafka    |  1.0   |        |   √    |   √    |   √    |         监控生成日志         |
+|     mock-db      |  1.0   |        |   √    |   √    |   √    |         生成业务数据         |
+|    mysql-hdfs    |  1.0   |   √   |       |         |         |      同步历史数据到 HDFS      |
+|    hdfs-mysql    |  1.0   |   √   |       |         |         |     同步 ADS 数据到 Mysql     |
+|    mysql-kafka   |  1.0   |        |   √   |         |         |         监控业务数据         |
+|  kafka-hdfs-db   |  1.0   |        |        |   √    |         |    将用户日志同步到 HDFS     |
+|  kafka-hdfs-log  |  1.0   |        |        |        |    √    |    将业务数据同步到 HDFS     |
 
 <br/>
 
@@ -263,10 +269,10 @@
 
 ```bash
     # 1. 拉取项目，并进行构建
-    cd ~                                                                       # 进入用户家目录
+    mkdir -p ~/github                                                          # 创建源码存储路径
+    cd ~/github                                                                # 进入源码存储目录
     git clone https://github.com/lihuashiyu/offline-data-warehouse.git         # 使用 git 将仓库中的代码和文件克隆到本地 
-    cd offline-data-warehouse/ || exit                                         # 进入项目
-    ./deploy.sh                                                                # 在项目的根目录下，进行构建项目，并将部署包上传到服务器
+    ~/offline-data-warehouse/deploy.sh                                         # 构建项目，并将部署包上传到服务器
     
     # 2. 登录 master 服务器，然后将部署包上传到 master 服务器用户的 家目录
     cd ~ || exit                                                               # 进入用户家目录
@@ -281,7 +287,6 @@
     
     # 5. 查看数据是否同步成功
     ${HADOOP_HOME}/bin/hadoop fs -ls -l /warehouse/tmp/
-     
 ```
 
 <br/>
